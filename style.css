@@ -68,6 +68,7 @@ body.locked {
     opacity: 0;
     transform: scale(1.1);
     pointer-events: none;
+    visibility: hidden; /* Ensure it's not rendered at all */
 }
 
 .entrance-info {
@@ -231,9 +232,12 @@ body.locked {
 .hero-bg {
     position: absolute;
     inset: 0;
-    background: url('assets/intro_last.jpg') no-repeat center center / cover;
+    /* Added a subtle darkening gradient to kill any 'sun' highlights/visual noise from the asset */
+    background: 
+        linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 50%),
+        url('assets/intro_last.jpg') no-repeat center center / cover;
     z-index: -1;
-    filter: brightness(0.6) saturate(1.2);
+    filter: brightness(0.55) saturate(1.1);
     transition: transform 0.5s ease-out;
 }
     height: 100%;
