@@ -38,39 +38,31 @@ class Particle {
     }
 
     reset(initial = false) {
-        this.size = Math.random() * 25 + 15; // Viscous large blobs
-        this.depth = Math.random() * 0.6 + 0.4;
+        // Gold Sparkle/Glint look: Tiny, bright, varying depths
+        this.size = Math.random() * 2.5 + 0.5; 
+        this.depth = Math.random() * 0.8 + 0.2;
         this.x = Math.random() * canvas.width;
-        this.y = initial ? Math.random() * canvas.height : -100;
-        this.vx = (Math.random() * 0.2 - 0.1) * this.depth;
-        this.vy = (Math.random() * 0.3 + 0.2) * this.depth;
-        this.opacity = Math.random() * 0.25 + 0.1;
-        this.attractionRange = 120;
+        this.y = initial ? Math.random() * canvas.height : -20;
+        
+        // Slower, floating motion
+        this.vx = (Math.random() * 0.15 - 0.075) * this.depth;
+        this.vy = (Math.random() * 0.25 + 0.15) * this.depth;
+        
+        this.opacity = Math.random() * 0.5 + 0.2;
+        this.baseOpacity = this.opacity;
+        this.twinkleSpeed = Math.random() * 0.05 + 0.01;
+        this.twinklePhase = Math.random() * Math.PI * 2;
     }
 
-    update(others) {
-        // Subtle liquid attraction
-        others.forEach(other => {
-            if (other === this) return;
-            const dx = other.x - this.x;
-            const dy = other.y - this.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            if (dist < this.attractionRange) {
-                const force = (1 - dist / this.attractionRange) * 0.005;
-                this.vx += dx * force;
-                this.vy += dy * force;
-            }
-        });
-
-        // Viscosity damping
-        this.vx *= 0.99;
-        this.vy *= 0.99;
-
+    update() {
         this.y += this.vy;
         this.x += this.vx;
 
-        if (this.y > canvas.height + 150) {
+        // Twinkle effect: Sinusoidal opacity variation
+        this.twinklePhase += this.twinkleSpeed;
+        this.opacity = this.baseOpacity + Math.sin(this.twinklePhase) * 0.2;
+
+        if (this.y > canvas.height + 20) {
             this.reset();
         }
     }
@@ -78,10 +70,24 @@ class Particle {
     draw() {
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+        
+        // Metallic gold glint
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
+        gradient.addColorStop(0, `rgba(252, 246, 186, ${this.opacity})`); // Bright gold
+        gradient.addColorStop(0.4, `rgba(212, 175, 55, ${this.opacity * 0.8})`); // Gold
+        gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
+        
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+        ctx.arc(0, 0, this.size * 2, 0, Math.PI * 2);
         ctx.fill();
+        
+        // Add a tiny Core for sharp glint
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity * 0.5})`;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
     }
 }
@@ -97,7 +103,7 @@ const animateParticles = () => {
     if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach((particle) => {
-        particle.update(particles);
+        particle.update();
         particle.draw();
     });
     requestAnimationFrame(animateParticles);
@@ -316,22 +322,28 @@ const initCinematicEntrance = () => {
         entranceOverlay.style.transition = 'opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), transform 2.2s cubic-bezier(0.16, 1, 0.3, 1)';
         entranceOverlay.classList.add('is-hidden');
 
-        // Step 2: Show Intro (GIF or Video)
+        // Step 2: Show Intro GIF Portal
         introVideoWrap.classList.add('is-active');
         
-        // If it's a video, we can still use onended, but for GIF we use a fixed timeout
-        if (introVideo.tagName === 'VIDEO') {
-            introVideo.play().catch(() => unlockExperience());
-            introVideo.onended = unlockExperience;
-        } else {
-            // High-end GIF transition timing (match intro.gif length)
-            setTimeout(unlockExperience, 7200);
-        }
-        
-        // Final sync of reveal states
+        // Step 3: Start Typing IMMEDIATELY over the cinematic intro
+        // We delay it slightly so the overlay fade doesn't swallow it
         setTimeout(() => {
-            syncProgress();
+            playIntroTyping(); // This starts the immersive text typing
         }, 1200);
+
+        // Step 4: High-end transition to "Paused" state (Last Frame)
+        // Match the GIF duration (~7.2s)
+        setTimeout(() => {
+            introVideoWrap.style.transition = 'opacity 1.8s ease';
+            introVideoWrap.style.opacity = '0';
+            
+            setTimeout(() => {
+                introVideoWrap.classList.remove('is-active');
+                introVideoWrap.style.display = 'none';
+                document.body.classList.remove('locked');
+                syncProgress();
+            }, 1800);
+        }, 7200);
     };
 
     entranceOverlay.addEventListener('click', startExperience);
