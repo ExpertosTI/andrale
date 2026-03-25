@@ -15,16 +15,16 @@
     <div class="entrance-overlay" id="entrance-overlay">
         <div class="entrance-poster"></div>
         <div class="entrance-info">
-            <div class="wax-seal-inducer">
-                <div class="seal-glow"></div>
-                <!-- This will be the cover image provided by user -->
-                <div class="seal-image"></div>
-            </div>
             <h1 class="entrance-names">Michelle & Mike</h1>
         </div>
     </div>
 
-    <video id="bg-video" autoplay muted loop playsinline class="bg-video">
+    <video id="intro-scrub-video" muted playsinline class="bg-video intro-scrub" preload="auto">
+        <source src="assets/intro.mov" type="video/quicktime">
+        <source src="assets/intro.mov" type="video/mp4">
+    </video>
+
+    <video id="bg-video" muted loop playsinline class="bg-video" preload="auto">
         <source src="assets/bg.mov" type="video/quicktime">
         <source src="assets/bg.mov" type="video/mp4">
     </video>

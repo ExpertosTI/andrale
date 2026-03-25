@@ -59,9 +59,8 @@ body.locked {
     background: #060a12;
     cursor: pointer;
     transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), transform 2s cubic-bezier(0.16, 1, 0.3, 1);
-    background-image: 
-        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.22), transparent 70%),
-        linear-gradient(150deg, #060a12, #0d1a33 44%, #142a4d 82%, #0a1220);
+    background: url('assets/cover.jpg') no-repeat center center / cover;
+    background-color: #000;
 }
 
 .entrance-overlay.is-hidden {
@@ -101,7 +100,7 @@ body.locked {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.45) 0%, transparent 70%);
+    background: transparent; /* No more sun in the seal */
     animation: inducerPulse 3.5s ease-in-out infinite;
     mix-blend-mode: screen;
 }
@@ -175,10 +174,10 @@ body.locked {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10; 
+    z-index: 1; /* Above video, below content */
     pointer-events: none;
-    opacity: 0.95;
-    mix-blend-mode: screen; /* Perfect for gold glints/light */
+    opacity: 1;
+    mix-blend-mode: screen;
 }
 
 .bg-depth-layer {
@@ -210,8 +209,27 @@ body.locked {
     transform: translate(-50%, -50%);
     object-fit: cover;
     pointer-events: none;
-    opacity: 0.72;
-    filter: saturate(0.8) brightness(0.68) contrast(1.05);
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+/* Zero Noise Background Mask: Kills the 'sun' highlights in the video assets */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.bg-video.is-visible {
+    opacity: 1;
+}
+
+.intro-scrub {
+    z-index: -1;
+    filter: saturate(1.1) brightness(0.85);
 }
 
 .intro-video-wrap {
@@ -232,13 +250,8 @@ body.locked {
 .hero-bg {
     position: absolute;
     inset: 0;
-    /* Added a subtle darkening gradient to kill any 'sun' highlights/visual noise from the asset */
-    background: 
-        linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 50%),
-        url('assets/intro_last.jpg') no-repeat center center / cover;
+    background: transparent;
     z-index: -1;
-    filter: brightness(0.55) saturate(1.1);
-    transition: transform 0.5s ease-out;
 }
     height: 100%;
     object-fit: cover;
