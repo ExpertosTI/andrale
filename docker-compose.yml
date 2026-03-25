@@ -7,12 +7,20 @@ services:
     restart: always
     networks:
       - traefik-public
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.wedding.rule=Host(`boda.renace.tech`)"
-      - "traefik.http.routers.wedding.entrypoints=websecure"
-      - "traefik.http.routers.wedding.tls.certresolver=le"
-      - "traefik.http.services.wedding.loadbalancer.server.port=80"
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.wedding.rule=Host(`michellemike.renace.tech`)"
+        - "traefik.http.routers.wedding.entrypoints=websecure"
+        - "traefik.http.routers.wedding.tls.certresolver=le"
+        - "traefik.http.services.wedding.loadbalancer.server.port=80"
+        - "traefik.docker.network=traefik-public"
 
 networks:
   traefik-public:
