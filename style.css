@@ -31,10 +31,7 @@
 }
 
 body {
-    background:
-        radial-gradient(circle at 15% 12%, rgba(212, 175, 55, 0.18), transparent 36%),
-        radial-gradient(circle at 80% 22%, rgba(145, 163, 255, 0.14), transparent 40%),
-        linear-gradient(150deg, var(--bg-indigo), var(--bg-violet) 45%, var(--bg-teal));
+    background: linear-gradient(150deg, var(--bg-indigo), var(--bg-violet) 45%, var(--bg-teal));
     color: var(--cream);
     font-family: 'Lora', serif;
     overflow-x: hidden;
@@ -193,14 +190,9 @@ body.locked {
     transition: transform 0.35s ease-out;
 }
 
-.bg-depth-layer-1 {
-    background: radial-gradient(circle at 78% 12%, rgba(212, 175, 55, 0.18), transparent 52%);
-    filter: blur(10px);
-}
-
-.bg-depth-layer-2 {
-    background: radial-gradient(circle at 20% 86%, rgba(138, 179, 255, 0.15), transparent 58%);
-    transform: translate3d(calc(var(--depth-x) * 0.2), calc(var(--depth-y) * 0.2), 0);
+/* Removed bg-depth layers ('the sun') for visual clarity per user request */
+.bg-depth-layer {
+    display: none;
 }
 
 /* Removed bg-depth layers and silk for video focus */

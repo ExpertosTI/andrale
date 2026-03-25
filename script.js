@@ -38,22 +38,39 @@ class Particle {
     }
 
     reset(initial = false) {
-        this.size = Math.random() * 18 + 12; // Much larger for gooey look
-        this.depth = Math.random() * 0.7 + 0.3;
+        this.size = Math.random() * 25 + 15; // Viscous large blobs
+        this.depth = Math.random() * 0.6 + 0.4;
         this.x = Math.random() * canvas.width;
-        this.y = initial ? Math.random() * canvas.height : -50;
-        this.speedX = (Math.random() * 0.4 - 0.2) * this.depth;
-        this.speedY = (Math.random() * 0.6 + 0.3) * this.depth; // Viscous flow
-        this.opacity = Math.random() * 0.4 + 0.1;
-        this.rotation = Math.random() * 360;
-        this.rotationSpeed = (Math.random() * 0.2 - 0.1) * this.depth;
+        this.y = initial ? Math.random() * canvas.height : -100;
+        this.vx = (Math.random() * 0.2 - 0.1) * this.depth;
+        this.vy = (Math.random() * 0.3 + 0.2) * this.depth;
+        this.opacity = Math.random() * 0.25 + 0.1;
+        this.attractionRange = 120;
     }
 
-    update() {
-        this.y += this.speedY;
-        this.x += this.speedX;
-        this.rotation += this.rotationSpeed;
-        if (this.y > canvas.height + 50 || this.x < -100 || this.x > canvas.width + 100) {
+    update(others) {
+        // Subtle liquid attraction
+        others.forEach(other => {
+            if (other === this) return;
+            const dx = other.x - this.x;
+            const dy = other.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist < this.attractionRange) {
+                const force = (1 - dist / this.attractionRange) * 0.005;
+                this.vx += dx * force;
+                this.vy += dy * force;
+            }
+        });
+
+        // Viscosity damping
+        this.vx *= 0.99;
+        this.vy *= 0.99;
+
+        this.y += this.vy;
+        this.x += this.vx;
+
+        if (this.y > canvas.height + 150) {
             this.reset();
         }
     }
@@ -61,12 +78,8 @@ class Particle {
     draw() {
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation * Math.PI / 180);
-        // Polished amber/gold slime color
         ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
-        
         ctx.beginPath();
-        // Liquid blob shape
         ctx.arc(0, 0, this.size, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
@@ -82,10 +95,9 @@ const initParticles = () => {
 
 const animateParticles = () => {
     if (!ctx || !canvas) return;
-    animationTick += 1;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach((particle) => {
-        particle.update(animationTick);
+        particle.update(particles);
         particle.draw();
     });
     requestAnimationFrame(animateParticles);
@@ -286,7 +298,6 @@ const initCinematicEntrance = () => {
         document.body.style.height = 'auto';
         if (scrollProgress) scrollProgress.classList.remove('is-hidden');
         
-        // Final hide of intro wrap
         if (introVideoWrap) {
             introVideoWrap.style.transition = 'opacity 1.5s ease';
             introVideoWrap.style.opacity = '0';
@@ -295,7 +306,6 @@ const initCinematicEntrance = () => {
                 introVideoWrap.style.display = 'none';
             }, 1600);
         }
-
         playIntroTyping();
     };
 
@@ -303,41 +313,25 @@ const initCinematicEntrance = () => {
         if (opened) return;
         opened = true;
 
-        // Step 1: Hide Overlay with a professional scale/fade
         entranceOverlay.style.transition = 'opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), transform 2.2s cubic-bezier(0.16, 1, 0.3, 1)';
         entranceOverlay.classList.add('is-hidden');
 
-        // Backup unlock
-        const safetyTimeout = setTimeout(() => {
-            if (introVideoWrap.classList.contains('is-active')) {
-                unlockExperience();
-            }
-        }, 12000);
-
-        // Step 2: Play Intro Video
+        // Step 2: Show Intro (GIF or Video)
         introVideoWrap.classList.add('is-active');
-        introVideo.play().catch(e => {
-            console.warn("Video play failed:", e);
-            unlockExperience();
-        });
         
-        let earlyRevealTriggered = false;
-        introVideo.ontimeupdate = () => {
-            if (!earlyRevealTriggered && introVideo.duration > 0 && 
-                introVideo.currentTime >= (introVideo.duration - 4.2)) {
-                earlyRevealTriggered = true;
-                unlockExperience();
-                syncProgress();
-            }
-        };
-
-        introVideo.onended = () => {
-            clearTimeout(safetyTimeout);
-            if (!earlyRevealTriggered) {
-                unlockExperience();
-                syncProgress();
-            }
-        };
+        // If it's a video, we can still use onended, but for GIF we use a fixed timeout
+        if (introVideo.tagName === 'VIDEO') {
+            introVideo.play().catch(() => unlockExperience());
+            introVideo.onended = unlockExperience;
+        } else {
+            // High-end GIF transition timing (match intro.gif length)
+            setTimeout(unlockExperience, 7200);
+        }
+        
+        // Final sync of reveal states
+        setTimeout(() => {
+            syncProgress();
+        }, 1200);
     };
 
     entranceOverlay.addEventListener('click', startExperience);
