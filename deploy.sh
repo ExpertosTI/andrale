@@ -35,6 +35,9 @@ ssh ${REMOTE_USER}@${REMOTE_HOST} << EOF
     echo "Pulling latest changes from GitHub..."
     git pull origin main
 
+    echo "Building Docker Image: miki-wedding:latest..."
+    docker build -t miki-wedding:latest .
+
     echo "Verifying Network: ${NETWORK_NAME}..."
     # RenaceNet is the standard protocol network
     docker network ls | grep ${NETWORK_NAME} > /dev/null || docker network create --driver overlay ${NETWORK_NAME}

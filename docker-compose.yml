@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   wedding:
+    image: miki-wedding:latest
     build: .
     container_name: michelle-mike-wedding
     restart: always
