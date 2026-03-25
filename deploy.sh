@@ -1,61 +1,51 @@
 #!/bin/bash
-# Wedding Invitation - Docker Stack Deployment
-# Target: michellemike.renace.tech (RenaceNet Infrastructure)
+# ==============================================================================
+# MIKI - Automated Wedding Invitation Deployment
+# ==============================================================================
+# Protocol: RENACE.TECH (Local Build + Swarm Stack)
 
-# Configuration
-REMOTE_HOST="renace.tech"
-REMOTE_USER="root"
-REMOTE_PATH="/var/www/miki"
+set -e
+
+REPO_URL="https://github.com/ExpertosTI/miki.git"
+PROJECT_DIR="/var/www/miki"
 STACK_NAME="miki-wedding"
-NETWORK_NAME="RenaceNet"
+SERVICE_NAME="miki-wedding_wedding"
 
-echo "------------------------------------------------"
-echo "🚀 Starting Docker Stack deployment to renace.tech"
-echo "------------------------------------------------"
+echo "========================================================"
+echo "🚀 Starting MIKI Deployment (Wedding)..."
+echo "========================================================"
 
-# 1. Ensure local changes are pushed
-echo "Checking Git status..."
-if [[ -n $(git status -s) ]]; then
-    echo "⚠️  You have uncommitted changes. Please commit and push to ExpertosTI/miki before deploying."
-    exit 1
-fi
-
-# 2. Remote Deployment
-echo "Connecting to ${REMOTE_HOST}..."
-ssh ${REMOTE_USER}@${REMOTE_HOST} << EOF
-    # Ensure directory exists and is a git repo
-    if [ ! -d "${REMOTE_PATH}" ]; then
-        echo "Creating project directory..."
-        mkdir -p /var/www
-        git clone https://github.com/ExpertosTI/miki.git ${REMOTE_PATH}
-    fi
-
-    cd ${REMOTE_PATH}
-    
-    echo "Pulling latest changes from GitHub..."
-    git pull origin main
-
-    echo "Building Docker Image: miki-wedding:latest..."
-    docker build -t miki-wedding:latest .
-
-    echo "Verifying Network: ${NETWORK_NAME}..."
-    # RenaceNet is the standard protocol network
-    docker network ls | grep ${NETWORK_NAME} > /dev/null || docker network create --driver overlay ${NETWORK_NAME}
-
-    echo "Deploying Docker Stack: ${STACK_NAME}..."
-    docker stack deploy -c docker-compose.yml ${STACK_NAME} --with-registry-auth
-
-    echo "Cleaning up old images..."
-    docker image prune -f
-EOF
-
-if [ $? -eq 0 ]; then
-    echo "------------------------------------------------"
-    echo "✅ Stack Deployment Successful!"
-    echo "URL: https://michellemike.renace.tech"
-    echo "------------------------------------------------"
+# 1. Sync Code
+if [ -d "$PROJECT_DIR" ]; then
+    echo "📁 Updating existing directory $PROJECT_DIR..."
+    cd "$PROJECT_DIR"
+    git fetch origin main
+    git reset --hard origin/main
 else
-    echo "------------------------------------------------"
-    echo "❌ Deployment Failed. Check server logs."
-    echo "------------------------------------------------"
+    echo "📥 Cloning repository to $PROJECT_DIR..."
+    git clone $REPO_URL $PROJECT_DIR
+    cd $PROJECT_DIR
 fi
+
+# 2. Build and deploy
+echo "🐳 Building Docker image locally..."
+docker compose build
+
+echo "🚀 Deploying stack to Docker Swarm (RenaceNet)..."
+# Ensure RenaceNet exists (Standard Renace Protocol)
+docker network ls | grep RenaceNet > /dev/null || docker network create --driver overlay RenaceNet
+
+docker stack deploy -c docker-compose.yml $STACK_NAME
+
+# 3. Force Pickup
+echo "🔄 Forcing Swarm to pick up the new local image..."
+docker service update --force $SERVICE_NAME 2>/dev/null || true
+
+# 4. Clean up
+echo "🧹 Cleaning up unused Docker images..."
+docker image prune -f
+
+echo "========================================================"
+echo "✅ Deployment successful!"
+echo "📡 URL: https://michellemike.renace.tech"
+echo "========================================================"
