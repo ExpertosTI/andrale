@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Boda de Michelle y Mike - 21 Junio 2026</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&family=Alex+Brush&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.525.0"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="entrance-overlay" id="entrance-overlay">
+        <div class="entrance-poster"></div>
+        <div class="entrance-info">
+            <div class="wax-seal-inducer">
+                <div class="seal-glow"></div>
+                <!-- This will be the cover image provided by user -->
+                <div class="seal-image"></div>
+            </div>
+            <h1 class="entrance-names">Michelle & Mike</h1>
+        </div>
+    </div>
+
+    <video id="bg-video" autoplay muted loop playsinline class="bg-video">
+        <source src="assets/bg.mov" type="video/quicktime">
+        <source src="assets/bg.mov" type="video/mp4">
+    </video>
+
+    <div class="silk-texture"></div>
+
+    <div id="intro-video-wrap" class="intro-video-wrap">
+        <video id="intro-video" muted playsinline class="intro-video">
+            <source src="assets/intro.mov" type="video/quicktime">
+            <source src="assets/intro.mov" type="video/mp4">
+        </video>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    <div class="scroll-progress" id="scroll-progress"></div>
+
+    <!-- Main Invitation Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="section hero active" id="hero">
+            <div class="hero-content">
+                <i data-lucide="sparkles" class="icon-hero"></i>
+                <p class="quote" data-immersive-text="intro">"Mejores son dos que uno... Porque si cayeren, el uno levantará a su compañero".</p>
+                <p class="verse" data-immersive-text="intro">Eclesiastés 4:9-10</p>
+                <div class="date-scroll">
+                    <span class="year" data-immersive-text="intro">2026</span>
+                    <span class="full-date" data-immersive-text="intro">21 de Junio</span>
+                </div>
+            </div>
+            <div class="scroll-arrow">
+                <i data-lucide="chevron-down"></i>
+            </div>
+        </section>
+
+        <!-- Details Section -->
+        <section class="section details" id="details">
+            <div class="glass-card saga-card" data-tilt>
+                <div class="icon-center-wrap">
+                    <i data-lucide="map-pin" class="card-icon"></i>
+                </div>
+                <h2 data-immersive-text="section">La Recepción</h2>
+                <div class="detail-grid">
+                    <div class="grid-item">
+                        <span class="label">DÓNDE</span>
+                        <p class="value">Distric event venue</p>
+                    </div>
+                    <div class="grid-item">
+                        <span class="label">CUÁNDO</span>
+                        <p class="value">8:00 PM</p>
+                    </div>
+                </div>
+                <p class="address" data-immersive-text="section">Frank Felix Miranda No. 5 naco, Sto.Dgo</p>
+                <div class="map-links">
+                    <a href="https://www.google.com/maps/search/?api=1&query=Frank+Felix+Miranda+No.+5+naco+Santo+Domingo" target="_blank" class="btn-map" title="Google Maps">
+                        <i data-lucide="map"></i>
+                    </a>
+                    <a href="https://ul.waze.com/ul?ll=18.4719,-69.9333&navigate=yes" target="_blank" class="btn-map" title="Waze">
+                        <i data-lucide="navigation"></i>
+                    </a>
+                    <a href="maps://?q=Frank+Felix+Miranda+No.+5+naco+Santo+Domingo" class="btn-map" title="Apple Maps">
+                        <i data-lucide="map-pin"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rules & Dress Code -->
+        <section class="section rules" id="rules">
+            <div class="glass-card saga-card" data-tilt>
+                <div class="icon-center-wrap">
+                    <div class="dress-code-icons">
+                        <i data-lucide="shirt" class="card-icon icon-dress-1"></i>
+                        <i data-lucide="sparkles" class="card-icon icon-dress-2"></i>
+                    </div>
+                </div>
+                <h2 data-immersive-text="section">Código de Vestimenta</h2>
+                <p class="style-title" data-immersive-text="section">FORMAL</p>
+                <div class="style-warning" data-immersive-text="section">
+                    <span class="warning-dim">Evitar el color </span>
+                    <span class="warning-bold">rojo</span>
+                    <span class="warning-dim">, por favor.</span>
+                </div>
+                <div class="divider"></div>
+                <div class="no-kids" data-immersive-text="section">
+                    <i data-lucide="baby" class="icon-forbidden"></i>
+                    <p>Evento solo para adultos</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gifts Section -->
+        <section class="section gifts" id="gifts">
+            <div class="glass-card saga-card" data-tilt>
+                <div class="icon-center-wrap">
+                    <i data-lucide="gift" class="card-icon"></i>
+                </div>
+                <h2 data-immersive-text="section">Regalos</h2>
+                <p class="gift-intro" data-immersive-text="section">Si desea hacernos un obsequio, estas son nuestras cuentas:</p>
+                
+                <div class="account-list">
+                    <div class="account-item" onclick="copyToClipboard('23054590023', 'BHD')">
+                        <div class="bank-wrap">
+                            <span class="bank">BHD</span>
+                        </div>
+                        <span class="acc-num">23054590023</span>
+                        <i data-lucide="copy" class="icon-copy"></i>
+                    </div>
+                    <div class="account-item" onclick="copyToClipboard('843559659', 'Popular')">
+                        <div class="bank-wrap">
+                            <span class="bank">Popular</span>
+                        </div>
+                        <span class="acc-num">843559659</span>
+                        <i data-lucide="copy" class="icon-copy"></i>
+                    </div>
+                    <div class="account-item" onclick="copyToClipboard('9607216343', 'Banreservas')">
+                        <div class="bank-wrap">
+                            <span class="bank">Banreservas</span>
+                        </div>
+                        <span class="acc-num">9607216343</span>
+                        <i data-lucide="copy" class="icon-copy"></i>
+                    </div>
+                </div>
+                <div class="holder-info">
+                    <strong>Michelle Domínguez</strong><br>
+                    Cédula: 402-2449863-0
+                </div>
+            </div>
+        </section>
+
+        <!-- Enterprise Footer -->
+        <footer class="section enterprise-footer" id="footer">
+            <div class="footer-corporate">
+                <div class="footer-top">
+                    <div class="footer-brand">
+                        <span class="brand-name">Michelle & Mike</span>
+                        <span class="brand-tag">BODA MMXXVI</span>
+                    </div>
+                    <div class="footer-divider"></div>
+                    <div class="footer-links">
+                        <a href="#hero" class="f-link">Inicio</a>
+                        <a href="#details" class="f-link">Ubicación</a>
+                        <a href="#gifts" class="f-link">Regalos</a>
+                    </div>
+                </div>
+                
+                <div class="footer-mid">
+                    <div class="countdown-mini" id="countdown">
+                        <div class="c-unit"><span id="days">00</span><label>DÍAS</label></div>
+                        <div class="c-unit"><span id="hours">00</span><label>HRS</label></div>
+                        <div class="c-unit"><span id="minutes">00</span><label>MIN</label></div>
+                        <div class="c-unit"><span id="seconds">00</span><label>SEG</label></div>
+                    </div>
+                </div>
+
+                <div class="footer-quote">
+                    <p class="final-msg">"El <span class="highlight">amor</span> incondicional y el compromiso <span class="highlight">eterno</span>."</p>
+                </div>
+
+                <div class="footer-bottom">
+                    <div class="legal">
+                        <p>&copy; 2026 Renace Technology Solutions. Todos los derechos reservados.</p>
+                    </div>
+                    <div class="expertos-credit">
+                        Power by <a href="https://expertosti.com" target="_blank">ExpertosTI</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <div id="toast" class="toast">¡Copiado!</div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

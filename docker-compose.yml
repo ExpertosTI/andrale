@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  wedding:
+    build: .
+    container_name: michelle-mike-wedding
+    restart: always
+    networks:
+      - traefik-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wedding.rule=Host(`boda.renace.tech`)"
+      - "traefik.http.routers.wedding.entrypoints=websecure"
+      - "traefik.http.routers.wedding.tls.certresolver=le"
+      - "traefik.http.services.wedding.loadbalancer.server.port=80"
+
+networks:
+  traefik-public:
+    external: true
