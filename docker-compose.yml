@@ -6,22 +6,24 @@ services:
     container_name: michelle-mike-wedding
     restart: always
     networks:
-      - traefik-public
+      - RenaceNet
     deploy:
       replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
       restart_policy:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.wedding.rule=Host(`michellemike.renace.tech`)"
-        - "traefik.http.routers.wedding.entrypoints=websecure"
-        - "traefik.http.routers.wedding.tls.certresolver=le"
-        - "traefik.http.services.wedding.loadbalancer.server.port=80"
-        - "traefik.docker.network=traefik-public"
+        - "traefik.http.routers.wedding-http.rule=Host(`michellemike.renace.tech`)"
+        - "traefik.http.routers.wedding-http.entrypoints=web"
+        - "traefik.http.routers.wedding-http.middlewares=wedding-redirect-https"
+        - "traefik.http.routers.wedding-https.rule=Host(`michellemike.renace.tech`)"
+        - "traefik.http.routers.wedding-https.entrypoints=websecure"
+        - "traefik.http.routers.wedding-https.tls=true"
+        - "traefik.http.routers.wedding-https.tls.certresolver=letsencryptresolver"
+        - "traefik.http.middlewares.wedding-redirect-https.redirectscheme.scheme=https"
+        - "traefik.http.services.wedding-svc.loadbalancer.server.port=80"
+        - "traefik.docker.network=RenaceNet"
 
 networks:
-  traefik-public:
+  RenaceNet:
     external: true

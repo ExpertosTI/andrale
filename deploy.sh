@@ -1,12 +1,13 @@
 #!/bin/bash
 # Wedding Invitation - Docker Stack Deployment
-# Target: michellemike.renace.tech (Docker Swarm / Traefik)
+# Target: michellemike.renace.tech (RenaceNet Infrastructure)
 
 # Configuration
 REMOTE_HOST="renace.tech"
 REMOTE_USER="root"
 REMOTE_PATH="/var/www/miki"
 STACK_NAME="miki-wedding"
+NETWORK_NAME="RenaceNet"
 
 echo "------------------------------------------------"
 echo "🚀 Starting Docker Stack deployment to renace.tech"
@@ -34,13 +35,12 @@ ssh ${REMOTE_USER}@${REMOTE_HOST} << EOF
     echo "Pulling latest changes from GitHub..."
     git pull origin main
 
-    echo "Deploying Docker Stack: ${STACK_NAME}..."
-    # Ensure external network exists (standard in Renace ecosystem)
-    docker network ls | grep traefik-public > /dev/null || docker network create --driver overlay traefik-public
+    echo "Verifying Network: ${NETWORK_NAME}..."
+    # RenaceNet is the standard protocol network
+    docker network ls | grep ${NETWORK_NAME} > /dev/null || docker network create --driver overlay ${NETWORK_NAME}
 
-    # Deploy the stack
-    # Note: Using docker stack deploy --with-registry-auth if needed
-    docker stack deploy -c docker-compose.yml ${STACK_NAME}
+    echo "Deploying Docker Stack: ${STACK_NAME}..."
+    docker stack deploy -c docker-compose.yml ${STACK_NAME} --with-registry-auth
 
     echo "Cleaning up old images..."
     docker image prune -f
