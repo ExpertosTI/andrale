@@ -66,8 +66,11 @@ body.locked { overflow: hidden; height: 100vh; }
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 @keyframes hintPulse {
-    0%, 100% { opacity: 0; transform: translateY(0); }
-    50% { opacity: 0.9; transform: translateY(-4px); }
+    0%, 100% { opacity: 0.4; transform: scale(0.9) translateY(0); }
+    50% { opacity: 1; transform: scale(1.1) translateY(-10px); }
+}
+.pulse-anim {
+    animation: hintPulse 2s ease-in-out infinite;
 }
 
 /* ===================================

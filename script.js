@@ -2,6 +2,8 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
 const progressBar = document.getElementById('scroll-progress');
 
+console.log('[LOG] Script initialized');
+
 const sections = document.querySelectorAll('.section');
 const rootStyle = document.documentElement.style;
 
@@ -11,15 +13,32 @@ const introVideoWrap = document.getElementById('intro-video-wrap');
 const entranceOverlay = document.getElementById('entrance-overlay');
 
 let particles = [];
-const particleCount = 450; // Increased to 450 to simulate dense dust
+const particleCount = 450; 
 let experienceStarted = false;
 let targetScroll = 0;
 let currentScroll = 0;
-let typingStarted = false;
 
-if (!canvas || !ctx) {
-    console.warn('Canvas or Context not found. Particles disabled.');
+// LOGGING SYSTEM
+const logger = (msg) => {
+    const now = new Date();
+    const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
+    console.log(`[INVITATION-LOG] [${timestamp}] ${msg}`);
+};
+
+// Pre-load monitoring
+if (introVideoScrub) {
+    introVideoScrub.addEventListener('loadstart', () => logger('Intro Video: Load Started'));
+    introVideoScrub.addEventListener('loadedmetadata', () => logger(`Intro Video: Metadata Loaded (Duration: ${introVideoScrub.duration}s)`));
+    introVideoScrub.addEventListener('canplaythrough', () => logger('Intro Video: Can Play Through (Ready)'));
 }
+
+if (bgVideo) {
+    bgVideo.addEventListener('loadstart', () => logger('BG Video: Load Started'));
+    bgVideo.addEventListener('loadedmetadata', () => logger(`BG Video: Metadata Loaded (Duration: ${bgVideo.duration}s)`));
+    bgVideo.addEventListener('canplaythrough', () => logger('BG Video: Can Play Through (Ready)'));
+}
+
+window.addEventListener('load', () => logger('Window fully loaded (All assets ready)'));
 
 const resizeCanvas = () => {
     if (!canvas) return;
@@ -189,6 +208,7 @@ const prepareImmersiveText = () => {
 
 const startExperience = () => {
     if (experienceStarted) return;
+    logger('Experience START triggered by user');
     experienceStarted = true;
 
     entranceOverlay.classList.add('is-hidden');
@@ -196,15 +216,26 @@ const startExperience = () => {
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
     
-    // Kickstart videos
-    if (introVideoScrub) introVideoScrub.load();
-    if (bgVideo) bgVideo.load();
+    // Kickstart videos (if not already loading/ready)
+    if (introVideoScrub) {
+        logger('Triggering Intro Video Load/Play');
+        introVideoScrub.play().then(() => {
+            introVideoScrub.pause(); // Just to ensure it's "live" for scrubbing
+            logger('Intro Video active and paused for scrubbing');
+        });
+    }
+    if (bgVideo) bgVideo.play().catch(e => logger('BG Video play error: ' + e));
 
     if (introVideoWrap) {
+        logger('Showing transition GIF');
         introVideoWrap.classList.add('is-active');
         setTimeout(() => {
+            logger('Fading out transition GIF');
             introVideoWrap.style.opacity = '0';
-            setTimeout(() => introVideoWrap.style.display = 'none', 1600);
+            setTimeout(() => {
+                introVideoWrap.style.display = 'none';
+                logger('Transition GIF hidden completely');
+            }, 1600);
         }, 800);
     }
 };
