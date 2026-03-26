@@ -1,6 +1,6 @@
 const weddingData = {
     hero: {
-        names: "Michelle y Mike",
+        names: "Michelle & Mike",
         date: "21 Junio 2026",
         verse: "\"Mejores son dos que uno... Porque si cayeren, el uno levantará a su compañero.\"",
         verse_book: "Eclesiastés 4:9-10"

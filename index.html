@@ -13,11 +13,11 @@
 <body class="is-scrolling">
 
     <!-- Scroll Hint Overlay -->
-    <div id="initial-scroll-prompt" class="entrance-overlay" style="background: transparent; z-index: 10;">
-        <div class="entrance-info" style="margin-top: 15vh;">
+    <div id="initial-scroll-prompt" class="entrance-overlay" style="background: transparent; z-index: 10; justify-content: flex-end; padding-bottom: 50px;">
+        <div class="entrance-info">
             <div class="entrance-hint pulse-anim" style="opacity: 0.9;">
-                <i data-lucide="chevrons-down" style="width: 48px; height: 48px; color: var(--accent-gold); margin-bottom: 15px;"></i>
-                <p style="letter-spacing: 4px; font-size: 0.85rem; font-family: 'Syncopate', sans-serif;">DESLIZA HACIA ABAJO</p>
+                <i data-lucide="chevrons-down" style="width: 44px; height: 44px; color: var(--accent-gold); margin-bottom: 15px;"></i>
+                <p style="letter-spacing: 4px; font-size: 0.8rem; font-family: 'Syncopate', sans-serif;">DESLIZA HACIA ABAJO</p>
             </div>
         </div>
     </div>
@@ -50,8 +50,7 @@
     <!-- Main Content -->
     <main id="main-content">
         <!-- Pacer: determines how far we scroll through the intro video before details show -->
-        <div id="intro-pacer" style="height: 140vh; width: 100%; pointer-events: none;"></div>
-
+        <div id="intro-pacer" style="height: 200vh; width: 100%; pointer-events: none;"></div>
 
         <!-- Reception (Data sourced from data.js) -->
         <section class="section details" id="details">
@@ -116,10 +115,17 @@
             </div>
         </section>
 
-        <!-- Closing Message -->
-        <div class="closing-message-wrap">
+        <!-- Closing Message & Countdown -->
+        <section class="section closing-message-wrap" id="closing">
             <p class="closing-message-text fade-in-text" id="data-closing-message"></p>
-        </div>
+            
+            <div class="countdown-card fade-in-text" id="countdown">
+                <div class="time-block"><span id="cd-days" class="time-num">00</span><span class="time-label">DÍAS</span></div>
+                <div class="time-block"><span id="cd-hours" class="time-num">00</span><span class="time-label">HORAS</span></div>
+                <div class="time-block"><span id="cd-mins" class="time-num">00</span><span class="time-label">MINUTOS</span></div>
+                <div class="time-block"><span id="cd-secs" class="time-num">00</span><span class="time-label">SEGUNDOS</span></div>
+            </div>
+        </section>
 
     </main>
 

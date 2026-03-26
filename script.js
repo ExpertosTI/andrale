@@ -149,10 +149,10 @@ const animate = () => {
                 introVideoScrub.currentTime = ratio * (introVideoScrub.duration - 0.05);
                 introVideoScrub.classList.add('is-visible');
 
-                // Fixed Hero Overlay Logic: Appears between 60% and 130% of the introZone scroll
+                // Fixed Hero Overlay Logic: Appears between 60% and 105% of the introZone scroll
                 const hero = document.getElementById('hero-overlay');
                 if (hero) {
-                    if (ratio > 0.6 && ratio < 1.3) {
+                    if (ratio > 0.6 && ratio < 1.05) {
                         hero.classList.add('is-visible');
                         hero.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.add('is-visible'));
                         hero.querySelectorAll('.fade-in-text').forEach(t => t.classList.add('is-visible'));
@@ -231,6 +231,26 @@ const prepareImmersiveText = () => {
         element.dataset.textPrepared = 'true';
     });
 };
+
+// Countdown Logic
+const targetDate = new Date('2026-06-21T20:00:00').getTime();
+const updateCountdown = () => {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+    if (distance < 0) return;
+    
+    const d = document.getElementById('cd-days');
+    const h = document.getElementById('cd-hours');
+    const m = document.getElementById('cd-mins');
+    const s = document.getElementById('cd-secs');
+
+    if (d) d.innerText = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+    if (h) h.innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+    if (m) m.innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+    if (s) s.innerText = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
+};
+setInterval(updateCountdown, 1000);
+updateCountdown();
 
 // Immediate start mode
 experienceStarted = true;
