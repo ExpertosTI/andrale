@@ -298,11 +298,13 @@ body.locked {
         padding: 15px 20px !important;
     }
 
-    /* Video scaling for mobile */
+    /* Video scaling for mobile: Avoid vertical zoom crop */
     .bg-video, .intro-scrub {
-        width: 100vw !important;
-        height: 100vh !important;
-        object-fit: cover !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        background: #000;
+        transform: translate(-50%, -50%) scale(1.1); /* Slight over-scale to hide potential edges */
     }
 }
 
