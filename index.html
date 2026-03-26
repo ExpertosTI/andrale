@@ -13,9 +13,12 @@
 </head>
 <body>
     <div class="entrance-overlay" id="entrance-overlay">
-        <div class="entrance-poster"></div>
         <div class="entrance-info">
-            <h1 class="entrance-names">Michelle & Mike</h1>
+            <h1 class="entrance-names" data-immersive-text="intro">Michelle & Mike</h1>
+            <p class="entrance-date">21 DE JUNIO, 2026</p>
+            <div class="enter-btn-wrap">
+                <button class="enter-btn">VER INVITACIÓN</button>
+            </div>
         </div>
     </div>
 
@@ -41,19 +44,20 @@
     <!-- Main Invitation Content -->
     <main id="main-content">
         <!-- Hero Section -->
-        <section class="section hero active" id="hero">
-            <div class="hero-bg" id="hero-bg"></div>
+        <section class="section active" id="hero">
             <div class="hero-content">
-                <i data-lucide="sparkles" class="icon-hero"></i>
-                <p class="quote" data-immersive-text="intro">"Mejores son dos que uno... Porque si cayeren, el uno levantará a su compañero".</p>
-                <p class="verse" data-immersive-text="intro">Eclesiastés 4:9-10</p>
-                <div class="date-scroll">
-                    <span class="year" data-immersive-text="intro">2026</span>
-                    <span class="full-date" data-immersive-text="intro">21 de Junio</span>
+                <!-- Names First for Impact -->
+                <h1 class="hero-names" data-immersive-text="intro">Michelle & Mike</h1>
+                <div class="hero-separator"></div>
+                
+                <p class="hero-quote" data-immersive-text>
+                    "Hermanos, den gracias a Dios por todo, porque esto es lo que Él quiere de ustedes como creyentes en Cristo Jesús."<br>
+                    <span>1 Tesalonicenses 5:18</span>
+                </p>
+                <div class="hero-date">21 DE JUNIO, 2026</div>
+                <div class="scroll-indicator">
+                    <div class="arrow"></div>
                 </div>
-            </div>
-            <div class="scroll-arrow">
-                <i data-lucide="chevron-down"></i>
             </div>
         </section>
 

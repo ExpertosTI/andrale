@@ -79,11 +79,42 @@ body.locked {
 
 .entrance-names {
     font-family: 'Alex Brush', cursive;
-    font-size: min(12vw, 4.8rem);
+    font-size: clamp(3rem, 10vw, 4.5rem);
     color: var(--gold-bright);
-    margin-top: 30px;
-    text-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
-    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+}
+
+.entrance-date {
+    font-family: 'Syncopate', sans-serif;
+    letter-spacing: 0.4em;
+    font-size: 0.8rem;
+    color: var(--gold);
+    opacity: 0.8;
+    margin-bottom: 2.5rem;
+}
+
+.enter-btn-wrap {
+    margin-top: 1rem;
+}
+
+.enter-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 12px 30px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    border-radius: 2px;
+}
+
+.enter-btn:hover {
+    background: var(--gold);
+    color: #000;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .wax-seal-inducer {
@@ -466,6 +497,24 @@ body::before {
         scale(0.88)
         rotate(calc((var(--char-spin) - 0.5) * 28deg));
     filter: blur(16px);
+}
+
+.hero-names {
+    font-family: 'Alex Brush', cursive;
+    font-size: clamp(3.5rem, 12vw, 5.5rem);
+    color: var(--gold-bright);
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+}
+
+.hero-quote {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    max-width: 85%;
+    margin: 0 auto 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .quote {
