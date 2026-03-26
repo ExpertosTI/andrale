@@ -117,4 +117,6 @@ app.get('/api/stats', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`💒 Wedding server running on port ${PORT}`);
+    console.log(`⏰ Current Server Time: ${new Date().toLocaleString('es-DO', { timeZone: 'America/Santo_Domingo' })}`);
+    console.log(`🌐 System Local Time: ${new Date().toLocaleString()}`);
 });

@@ -6,6 +6,8 @@ services:
     build: .
     container_name: michelle-mike-wedding
     restart: always
+    environment:
+      - TZ=America/Santo_Domingo
     volumes:
       - wedding-data:/app/data
     networks:
