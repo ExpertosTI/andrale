@@ -442,8 +442,9 @@ body.locked { overflow: hidden; height: 100vh; }
     .bank { font-size: 0.7rem; }
     .acc-num { font-size: 0.95rem; }
 
-    /* Intro video: contained in its section */
-    .intro-scrub {
-        object-position: center 30%;
+    /* Zoom out the video to see more of the envelope, avoiding extreme crop */
+    .bg-video, .intro-scrub {
+        object-fit: contain !important;
+        transform: translate(-50%, -50%) scale(1.35); /* Zooms out significantly compared to cover */
     }
 }
