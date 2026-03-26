@@ -75,7 +75,9 @@ class Particle {
 
 const initParticles = () => {
     particles = [];
-    for (let i = 0; i < particleCount; i += 1) {
+    // Device-aware density: fewer particles on mobile for performance
+    const count = window.innerWidth < 600 ? 150 : 450;
+    for (let i = 0; i < count; i += 1) {
         particles.push(new Particle());
     }
 };
