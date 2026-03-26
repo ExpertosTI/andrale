@@ -127,11 +127,6 @@ const animate = () => {
                 introVideoScrub.currentTime = ratio * (introVideoScrub.duration - 0.05);
                 introVideoScrub.classList.add('is-visible');
 
-                // Trigger typing during the last 4 seconds of the intro video
-                if (!typingStarted && introVideoScrub.currentTime >= Math.max(0, introVideoScrub.duration - 4)) {
-                    typingStarted = true;
-                    playIntroTyping();
-                }
             }
             if (bgVideo) bgVideo.classList.remove('is-visible');
         } else {
@@ -147,7 +142,7 @@ const animate = () => {
         sections.forEach((section) => {
             const rect = section.getBoundingClientRect();
             const center = rect.top + rect.height / 2;
-            const dist = (center - vh / 2) / (vh * 0.7);
+            const dist = (center - vh / 2) / (vh * 0.75);
             const absDist = Math.abs(dist);
             
             if (absDist < 1.2) {
@@ -157,8 +152,8 @@ const animate = () => {
                 section.style.transform = `scale(${scale}) translateY(${dist * 40}px)`;
                 section.style.pointerEvents = opacity > 0.4 ? 'auto' : 'none';
                 
-                // Reveal both immersive and standard fade-in texts
-                section.querySelectorAll('[data-immersive-text]:not([data-immersive-text="intro"])').forEach(t => t.classList.toggle('is-visible', opacity > 0.5));
+                // Reveal all immersive texts inside
+                section.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.toggle('is-visible', opacity > 0.5));
                 section.querySelectorAll('.fade-in-text').forEach(t => t.classList.toggle('is-visible', opacity > 0.6));
             } else {
                 section.style.opacity = '0';
@@ -192,24 +187,6 @@ const prepareImmersiveText = () => {
     });
 };
 
-const playIntroTyping = () => {
-    document.querySelectorAll('[data-immersive-text="intro"]').forEach((target, tidx) => {
-        const chars = target.querySelectorAll('.text-char');
-        chars.forEach((char, cidx) => {
-            setTimeout(() => char.classList.add('is-on'), (tidx * 800) + (cidx * 30));
-        });
-        target.classList.add('is-visible');
-    });
-    // Ensure parent section forces opacity 1 for the hero text manually
-    const heroSection = document.getElementById('hero');
-    if (heroSection) heroSection.style.opacity = '1';
-    
-    // Also trigger any non-immersive fade-in text in the hero section
-    setTimeout(() => {
-        if (heroSection) heroSection.querySelectorAll('.fade-in-text').forEach(t => t.classList.add('is-visible'));
-    }, 1500); 
-};
-
 const startExperience = () => {
     if (experienceStarted) return;
     experienceStarted = true;
@@ -239,7 +216,6 @@ window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { pa
 
 initParticles();
 animate();
-prepareImmersiveText();
 
 window.copyToClipboard = (text, bankName) => {
     navigator.clipboard.writeText(text).then(() => {

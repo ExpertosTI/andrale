@@ -77,4 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setHtml('data-gifts-holder', `<strong>${weddingData.gifts.holder_name}</strong><br>Cédula: ${weddingData.gifts.holder_id}`);
     setText('data-closing-message', weddingData.gifts.closing_message);
+
+    // Call prepare Immersive Text after the DOM is fully hydrated
+    if (typeof prepareImmersiveText === 'function') {
+        prepareImmersiveText();
+    }
 });

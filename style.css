@@ -78,14 +78,18 @@ body.locked { overflow: hidden; height: 100vh; }
     width: 100vw; height: 100vh;
     z-index: -2;
     transform: translate(-50%, -50%);
-    object-fit: cover;
+    object-fit: cover !important;
     pointer-events: none;
     opacity: 0;
     transition: opacity 1.5s ease;
-    filter: sepia(0.35) saturate(1.4) hue-rotate(-15deg);
+    /* Extra dense sepia to completely kill blue silk tones and force champagne */
+    filter: sepia(0.55) saturate(1.8) hue-rotate(-15deg) contrast(1.15) brightness(1.05);
 }
 .bg-video.is-visible { opacity: 1; }
-.intro-scrub { z-index: -1; filter: sepia(0.3) saturate(1.3) hue-rotate(-10deg) brightness(0.95); }
+.intro-scrub { 
+    z-index: -1; 
+    filter: sepia(0.4) saturate(1.5) hue-rotate(-10deg) brightness(0.95); 
+}
 
 /* ===================================
    INTRO GIF WRAP
@@ -145,7 +149,6 @@ body.locked { overflow: hidden; height: 100vh; }
     max-width: 650px;
     padding: 30px;
     border-radius: 20px;
-    /* Hero text sits over the dark video, so keep it light */
 }
 .hero-names {
     font-family: 'Alex Brush', cursive;
@@ -192,6 +195,26 @@ body.locked { overflow: hidden; height: 100vh; }
 }
 
 /* ===================================
+   CLOSING MESSAGE (Standalone Block)
+   =================================== */
+.closing-message-wrap {
+    padding: 60px 24px 80px;
+    text-align: center;
+    background: rgba(237, 230, 222, 0.4);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(255,255,255,0.3);
+}
+.closing-message-text {
+    font-family: 'Lora', serif;
+    font-size: 1.25rem;
+    color: var(--text-bold);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+    font-style: italic;
+}
+
+/* ===================================
    GLASS CARDS (saga-card) - LIGHT THEME
    =================================== */
 .saga-card {
@@ -231,6 +254,22 @@ body.locked { overflow: hidden; height: 100vh; }
 @keyframes iconFloat {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-6px); }
+}
+
+/* Custom Icon Animations */
+.section.details .card-icon { animation: pinTravel 6s ease-in-out infinite; }
+.section.gifts .card-icon { animation: giftPop 6s ease-in-out infinite; }
+
+@keyframes pinTravel {
+    0%, 100% { transform: translateX(-25px) translateY(5px) rotate(-10deg); opacity: 0.6; }
+    50% { transform: translateX(0) translateY(-5px) rotate(0); opacity: 1; }
+}
+@keyframes giftPop {
+    0% { transform: scale(0); opacity: 0; }
+    20% { transform: scale(1); opacity: 1; }
+    45% { transform: scale(1.3) translateY(-5px); opacity: 1; }
+    65% { transform: scale(1.8) translateY(-15px); opacity: 0; }
+    100% { transform: scale(0); opacity: 0; }
 }
 
 .dress-code-icons {
@@ -315,8 +354,8 @@ body.locked { overflow: hidden; height: 100vh; }
 .text-char {
     display: inline-block; opacity: 0;
     transform: translateY(1em); filter: blur(8px);
-    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1), opacity 0.6s ease, filter 0.7s ease;
-    transition-delay: calc(var(--char-index) * 15ms);
+    transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease, filter 0.6s ease;
+    transition-delay: calc(var(--char-index) * 12ms);
     will-change: transform, opacity, filter;
 }
 [data-immersive-text].is-visible .text-char,
@@ -327,7 +366,7 @@ body.locked { overflow: hidden; height: 100vh; }
 .fade-in-text {
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 1s ease, transform 1s ease;
+    transition: opacity 0.8s ease, transform 0.8s ease;
 }
 .section.active .fade-in-text,
 .fade-in-text.is-visible {
@@ -362,10 +401,9 @@ body.locked { overflow: hidden; height: 100vh; }
     .saga-card { padding: 35px 24px; border-radius: 28px; }
     .bank { font-size: 0.75rem; }
     .acc-num { font-size: 1rem; }
-
-    /* Zoom out the video to see more of the envelope */
+    /* Let the video cover the screen naturally to avoid cream borders */
     .bg-video, .intro-scrub {
-        object-fit: contain !important;
-        transform: translate(-50%, -50%) scale(1.35); 
+        object-fit: cover !important;
+        transform: translate(-50%, -50%); 
     }
 }
