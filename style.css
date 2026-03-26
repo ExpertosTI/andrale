@@ -298,13 +298,14 @@ body.locked {
         padding: 15px 20px !important;
     }
 
-    /* Video scaling for mobile: Avoid vertical zoom crop */
+    /* Cinematic Video Framing: No zoom bars, no pillarboxing */
     .bg-video, .intro-scrub {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        object-fit: cover !important;
+        object-position: center 30% !important; /* Ensures the wax seal is always focused */
         background: #000;
-        transform: translate(-50%, -50%) scale(1.1); /* Slight over-scale to hide potential edges */
+        transform: translate(-50%, -50%);
     }
 }
 

@@ -11,7 +11,7 @@ const introVideoWrap = document.getElementById('intro-video-wrap');
 const entranceOverlay = document.getElementById('entrance-overlay');
 
 let particles = [];
-const particleCount = 450; 
+const particleCount = 200; // Lower count for larger, gooey 'slime' particles
 let experienceStarted = false;
 let targetScroll = 0;
 let currentScroll = 0;
@@ -35,48 +35,76 @@ class Particle {
     }
 
     reset(initial = false) {
-        this.size = Math.random() * 1.5 + 0.4; 
-        this.depth = Math.random() * 0.9 + 0.1;
+        // Slime/Gold Dust: More 'viscous' feel
         this.x = Math.random() * canvas.width;
-        this.y = initial ? Math.random() * (canvas.height + 100) : -20;
+        this.y = initial ? Math.random() * canvas.height : (targetScroll > currentScroll ? canvas.height + 20 : -20);
         
-        this.vx = (Math.random() * 0.1 - 0.05) * this.depth;
-        this.vy = (Math.random() * 0.3 + 0.1) * this.depth;
+        this.size = Math.random() * 3 + 1; // Slightly larger for 'gooey' feel
+        this.depth = Math.random() * 0.8 + 0.2;
+        this.baseOpacity = Math.random() * 0.5 + 0.2;
         
-        this.baseOpacity = Math.random() * 0.4 + 0.15;
-        this.opacity = this.baseOpacity;
-        this.shimmerSpeed = Math.random() * 0.1 + 0.04;
+        // Motion: Not falling, but 'sticky' to scroll
+        this.offsetY = Math.random() * 50 - 25;
+        this.offsetX = Math.random() * 20 - 10;
+        
         this.shimmerPhase = Math.random() * Math.PI * 2;
-        this.color = Math.random() > 0.6 ? '#fcf6ba' : '#d4af37'; 
+        this.color = Math.random() > 0.5 ? '#fcf6ba' : '#d4af37';
     }
 
     update() {
-        this.y += this.vy;
-        this.x += this.vx;
-        this.shimmerPhase += this.shimmerSpeed;
-        this.opacity = this.baseOpacity + Math.sin(this.shimmerPhase) * 0.2;
+        // SLIME FLOW: Particles follow scroll with 'viscosity' (lag)
+        const scrollDelta = targetScroll - currentScroll;
+        
+        // Horizontal 'liquid' drift
+        this.x += Math.sin(currentScroll * 0.005 + this.offsetY) * 0.2;
+        
+        // Vertical 'viscous' drag
+        // They drift slowly but react to scroll velocity
+        this.y -= scrollDelta * 0.02 * this.depth; 
+        
+        // Constant slow upward float (like bubbles in slime)
+        this.y -= 0.15 * this.depth;
 
-        if (this.y > canvas.height + 20) {
-            this.reset();
-        }
+        this.shimmerPhase += 0.05;
+        this.opacity = this.baseOpacity + Math.sin(this.shimmerPhase) * 0.15;
+
+        // Wrap around
+        if (this.y < -50) this.y = canvas.height + 50;
+        if (this.y > canvas.height + 50) this.y = -50;
     }
 
     draw() {
         ctx.save();
+        
+        // 'Slime' Distortion: Stretch based on scroll velocity
+        const scrollVel = Math.abs(targetScroll - currentScroll);
+        const stretch = 1 + Math.min(scrollVel * 0.015, 2.5);
+        
         ctx.translate(this.x, this.y);
+        ctx.rotate(Math.sin(this.shimmerPhase * 0.2) * 0.1);
+        
         ctx.fillStyle = this.color;
         ctx.globalAlpha = Math.max(0, this.opacity);
+        
+        // Draw elongated 'slime' droplet
         ctx.beginPath();
-        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, this.size, this.size * stretch, 0, 0, Math.PI * 2);
         ctx.fill();
+        
+        // Sparkle Core
+        ctx.fillStyle = '#fff';
+        ctx.globalAlpha = this.opacity * 0.6;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        
         ctx.restore();
     }
 }
 
 const initParticles = () => {
     particles = [];
-    // Device-aware density: fewer particles on mobile for performance
-    const count = window.innerWidth < 600 ? 150 : 450;
+    const count = window.innerWidth < 600 ? 120 : particleCount;
     for (let i = 0; i < count; i += 1) {
         particles.push(new Particle());
     }
@@ -86,7 +114,7 @@ const animate = () => {
     if (!ctx || !canvas) return;
     
     // Smooth Scroll Interpolation (Easing)
-    currentScroll += (targetScroll - currentScroll) * 0.1;
+    currentScroll += (targetScroll - currentScroll) * 0.08; // Slower interpolation for 'viscosity'
     
     // 1. Draw Particles
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -109,7 +137,7 @@ const animate = () => {
         if (currentScroll < introZone) {
             // Hero Intro Scrubbing
             if (introVideoScrub && !isNaN(introVideoScrub.duration)) {
-                const ratio = currentScroll / introZone;
+                const ratio = Math.max(0, currentScroll / introZone);
                 introVideoScrub.currentTime = ratio * (introVideoScrub.duration - 0.05);
                 introVideoScrub.classList.add('is-visible');
             }
@@ -117,7 +145,7 @@ const animate = () => {
         } else {
             // Main Content Scrubbing
             if (bgVideo && !isNaN(bgVideo.duration)) {
-                const bgRatio = (currentScroll - introZone) / (scrollMax - introZone);
+                const bgRatio = Math.max(0, (currentScroll - introZone) / (scrollMax - introZone));
                 bgVideo.currentTime = bgRatio * (bgVideo.duration - 0.05);
                 bgVideo.classList.add('is-visible');
             }
@@ -173,9 +201,9 @@ const playIntroTyping = () => {
     document.querySelectorAll('[data-immersive-text="intro"]').forEach((target, tidx) => {
         const chars = target.querySelectorAll('.text-char');
         chars.forEach((char, cidx) => {
-            setTimeout(() => char.classList.add('is-on'), (tidx * 800) + (cidx * 35));
+            setTimeout(() => char.classList.add('is-on'), (tidx * 800) + (cidx * 30));
         });
-        setTimeout(() => target.classList.add('is-visible'), (tidx * 800) + (chars.length * 35) + 300);
+        setTimeout(() => target.classList.add('is-visible'), (tidx * 800) + (chars.length * 30) + 300);
     });
 };
 
@@ -197,7 +225,7 @@ const startExperience = () => {
         setTimeout(() => {
             introVideoWrap.style.opacity = '0';
             setTimeout(() => introVideoWrap.style.display = 'none', 1600);
-        }, 1000);
+        }, 800);
     }
     
     playIntroTyping();
