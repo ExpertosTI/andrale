@@ -13,10 +13,16 @@ const introVideoWrap = document.getElementById('intro-video-wrap');
 const entranceOverlay = document.getElementById('entrance-overlay');
 
 let particles = [];
-const particleCount = 800; // Intensely dense gold dust for strong 'life' effect
+const baseParticleCount = window.innerWidth < 600 ? 550 : 800;
+let targetParticleCount = baseParticleCount;
 let experienceStarted = false;
 let targetScroll = 0;
 let currentScroll = 0;
+
+let pointerX = -1000;
+let pointerY = -1000;
+window.addEventListener('mousemove', (e) => { pointerX = e.clientX; pointerY = e.clientY; }, { passive: true });
+window.addEventListener('touchmove', (e) => { if (e.touches[0]) { pointerX = e.touches[0].clientX; pointerY = e.touches[0].clientY; } }, { passive: true });
 
 // LOGGING SYSTEM
 const logger = (msg) => {
@@ -85,6 +91,17 @@ class Particle {
         
         // Intrinsic slow float
         this.y -= 0.1 * this.depth + this.vy;
+
+        // Gravity pull towards user pointer
+        if (pointerX > -500 && pointerY > -500) {
+            const dx = pointerX - this.x;
+            const dy = pointerY - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 150 && dist > 5) {
+                this.x += (dx / dist) * 1.8; 
+                this.y += (dy / dist) * 1.8;
+            }
+        }
 
         this.shimmerPhase += 0.05;
         this.opacity = this.baseOpacity + Math.sin(this.shimmerPhase) * 0.25;
