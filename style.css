@@ -475,6 +475,103 @@ body.locked { overflow: hidden; height: 100vh; }
 .toast.is-active { transform: translateX(-50%) translateY(0); opacity: 1; }
 
 /* ===================================
+   RSVP BUTTON & MODAL
+   =================================== */
+.rsvp-section {
+    padding: 40px 24px 80px !important;
+    display: flex; justify-content: center;
+}
+.rsvp-btn {
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.85rem; letter-spacing: 3px;
+    color: var(--accent-gold); border: 2px solid var(--accent-gold);
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    padding: 18px 40px; border-radius: 50px;
+    cursor: pointer; transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    animation: rsvpPulse 3s ease-in-out infinite;
+}
+.rsvp-btn:hover { background: var(--accent-gold); color: #fff; transform: scale(1.05); }
+@keyframes rsvpPulse {
+    0%, 100% { box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+    50% { box-shadow: 0 8px 40px rgba(212,175,55,0.35); }
+}
+
+/* Modal Overlay */
+.rsvp-modal-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+.rsvp-modal-overlay.is-open { opacity: 1; pointer-events: auto; }
+
+.rsvp-modal-card {
+    max-width: 420px; width: 90%;
+    padding: 40px 30px !important; 
+    border-radius: 28px !important;
+    position: relative;
+    transform: translateY(30px) scale(0.95);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.rsvp-modal-overlay.is-open .rsvp-modal-card {
+    transform: translateY(0) scale(1);
+}
+.rsvp-close {
+    position: absolute; top: 15px; right: 20px;
+    font-size: 1.8rem; color: var(--text-brown);
+    background: none; border: none; cursor: pointer;
+    line-height: 1;
+}
+.rsvp-modal-title {
+    font-family: 'Alex Brush', cursive;
+    font-size: 2.2rem; color: var(--accent-gold);
+    margin-bottom: 25px; text-align: center;
+}
+.rsvp-input {
+    width: 100%; padding: 14px 18px;
+    border: 1px solid var(--bg-champagne);
+    border-radius: 14px; font-family: 'Lora', serif;
+    font-size: 1rem; color: var(--text-bold);
+    background: rgba(255,255,255,0.7);
+    margin-bottom: 12px; outline: none;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+.rsvp-input:focus { border-color: var(--accent-gold); }
+.rsvp-textarea { resize: none; }
+.rsvp-submit-btn {
+    width: 100%; padding: 16px;
+    background: var(--accent-gold); color: #fff;
+    border: none; border-radius: 14px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.85rem; letter-spacing: 2px;
+    cursor: pointer; margin-top: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(212,175,55,0.3);
+}
+.rsvp-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212,175,55,0.4); }
+.rsvp-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.rsvp-success {
+    text-align: center; padding: 20px 0;
+}
+.rsvp-success h4 {
+    font-family: 'Alex Brush', cursive;
+    font-size: 2.5rem; color: var(--accent-gold);
+    margin-bottom: 10px;
+}
+.rsvp-success p {
+    font-family: 'Lora', serif;
+    color: var(--text-brown); font-size: 1.1rem;
+}
+
+/* ===================================
    RESPONSIVE
    =================================== */
 @media (max-width: 600px) {
@@ -491,3 +588,4 @@ body.locked { overflow: hidden; height: 100vh; }
         transform: translate(-50%, -50%); 
     }
 }
+

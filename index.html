@@ -130,7 +130,37 @@
             </div>
         </section>
 
+        <!-- RSVP Section -->
+        <section class="section rsvp-section" id="rsvp">
+            <button class="rsvp-btn glass-card" id="rsvp-open" onclick="openRsvpModal()">
+                <i data-lucide="heart" style="width:24px; height:24px; margin-right:10px;"></i>
+                Confirmar Asistencia
+            </button>
+        </section>
+
     </main>
+
+    <!-- RSVP Modal -->
+    <div id="rsvp-modal" class="rsvp-modal-overlay">
+        <div class="rsvp-modal-card glass-card">
+            <button class="rsvp-close" onclick="closeRsvpModal()">&times;</button>
+            <h3 class="rsvp-modal-title">Confirmar Asistencia</h3>
+            <div id="rsvp-form-wrap">
+                <input type="text" id="rsvp-name" class="rsvp-input" placeholder="Tu nombre completo" required>
+                <input type="number" id="rsvp-guests" class="rsvp-input" placeholder="Número de acompañantes" min="1" max="10" value="1">
+                <textarea id="rsvp-message" class="rsvp-input rsvp-textarea" placeholder="Mensaje para los novios (opcional)" rows="3"></textarea>
+                <button class="rsvp-submit-btn" id="rsvp-submit" onclick="submitRsvp()">
+                    <i data-lucide="send" style="width:18px; height:18px; margin-right:8px;"></i>
+                    Confirmar
+                </button>
+            </div>
+            <div id="rsvp-success" class="rsvp-success" style="display:none;">
+                <i data-lucide="check-circle" style="width:60px; height:60px; color:var(--accent-gold); margin-bottom:20px;"></i>
+                <h4>¡Gracias!</h4>
+                <p>Los esperamos con mucho amor.</p>
+            </div>
+        </div>
+    </div>
 
     <div id="toast" class="toast">¡Copiado!</div>
 

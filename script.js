@@ -292,15 +292,84 @@ window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { pa
 initParticles();
 animate();
 
+// ========== EVENT TRACKING ==========
+const trackEvent = (type, meta = {}) => {
+    fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, meta })
+    }).catch(() => {}); // fire-and-forget
+};
+
 window.copyToClipboard = (text, bankName) => {
     if (navigator.vibrate) navigator.vibrate([15, 30, 15]);
+    trackEvent('copy_account', { bank: bankName, number: text });
     navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('toast');
         if (toast) {
-            toast.innerText = `Copiado: Cuenta ${bankName}`;
+            toast.innerText = `Copiado: ${bankName}`;
             toast.classList.add('is-active');
             setTimeout(() => toast.classList.remove('is-active'), 2500);
         }
     });
 };
 
+// ========== RSVP MODAL ==========
+window.openRsvpModal = () => {
+    if (navigator.vibrate) navigator.vibrate(10);
+    trackEvent('rsvp_open');
+    const modal = document.getElementById('rsvp-modal');
+    if (modal) {
+        modal.classList.add('is-open');
+        if (window.lucide) window.lucide.createIcons();
+    }
+};
+
+window.closeRsvpModal = () => {
+    const modal = document.getElementById('rsvp-modal');
+    if (modal) modal.classList.remove('is-open');
+};
+
+window.submitRsvp = async () => {
+    const nameEl = document.getElementById('rsvp-name');
+    const guestsEl = document.getElementById('rsvp-guests');
+    const messageEl = document.getElementById('rsvp-message');
+    const submitBtn = document.getElementById('rsvp-submit');
+    
+    if (!nameEl || !nameEl.value.trim()) {
+        nameEl.style.borderColor = '#e74c3c';
+        nameEl.focus();
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Enviando...';
+
+    try {
+        const res = await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: nameEl.value.trim(),
+                guests: parseInt(guestsEl.value) || 1,
+                message: (messageEl.value || '').trim()
+            })
+        });
+        
+        if (res.ok) {
+            if (navigator.vibrate) navigator.vibrate([20, 50, 20, 50, 20]);
+            document.getElementById('rsvp-form-wrap').style.display = 'none';
+            document.getElementById('rsvp-success').style.display = 'block';
+            if (window.lucide) window.lucide.createIcons();
+            
+            // Auto-close modal after 4s
+            setTimeout(() => window.closeRsvpModal(), 4000);
+        } else {
+            throw new Error('Server error');
+        }
+    } catch (e) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Confirmar';
+        alert('Error al confirmar. Intenta de nuevo.');
+    }
+};

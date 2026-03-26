@@ -6,6 +6,8 @@ services:
     build: .
     container_name: michelle-mike-wedding
     restart: always
+    volumes:
+      - wedding-data:/app/data
     networks:
       - RenaceNet
     deploy:
@@ -22,9 +24,13 @@ services:
         - "traefik.http.routers.wedding-https.tls=true"
         - "traefik.http.routers.wedding-https.tls.certresolver=letsencryptresolver"
         - "traefik.http.middlewares.wedding-redirect-https.redirectscheme.scheme=https"
-        - "traefik.http.services.wedding-svc.loadbalancer.server.port=80"
+        - "traefik.http.services.wedding-svc.loadbalancer.server.port=3000"
         - "traefik.docker.network=RenaceNet"
+
+volumes:
+  wedding-data:
 
 networks:
   RenaceNet:
     external: true
+

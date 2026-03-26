@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin — Boda M&M</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Syncopate:wght@400;700&family=Alex+Brush&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.525.0"></script>
+    <style>
+        :root {
+            --bg: #faf7f2;
+            --card-bg: rgba(255,255,255,0.85);
+            --text: #4a3728;
+            --text-light: #8b7355;
+            --gold: #d4af37;
+            --gold-light: rgba(212,175,55,0.15);
+            --border: rgba(212,175,55,0.25);
+            --shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Lora', serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Header */
+        .panel-header {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 30px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .panel-title {
+            font-family: 'Alex Brush', cursive;
+            font-size: 2rem; color: var(--gold);
+        }
+        .panel-subtitle {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.6rem; letter-spacing: 3px; color: var(--text-light);
+        }
+        .refresh-info {
+            font-size: 0.75rem; color: var(--text-light);
+        }
+
+        /* Layout */
+        .panel-body {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-num {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 2.2rem; font-weight: 700;
+            color: var(--gold);
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.7rem; letter-spacing: 2px;
+            color: var(--text-light);
+            margin-top: 8px;
+            font-family: 'Syncopate', sans-serif;
+        }
+
+        /* Tables */
+        .section-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.85rem; letter-spacing: 3px;
+            color: var(--gold);
+            margin: 30px 0 15px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title i { width: 20px; height: 20px; }
+
+        .data-table {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border-collapse: collapse;
+        }
+        .data-table th {
+            background: var(--gold-light);
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.65rem; letter-spacing: 2px;
+            color: var(--text);
+            padding: 14px 16px;
+            text-align: left;
+        }
+        .data-table td {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(212,175,55,0.1);
+            font-size: 0.9rem;
+            vertical-align: top;
+        }
+        .data-table tr:hover td { background: rgba(212,175,55,0.05); }
+
+        .badge {
+            display: inline-block;
+            background: var(--gold-light);
+            color: var(--gold);
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.6rem; letter-spacing: 1px;
+            padding: 4px 10px; border-radius: 20px;
+        }
+        .msg-cell { max-width: 250px; font-style: italic; color: var(--text-light); }
+        .time-cell { font-size: 0.8rem; color: var(--text-light); white-space: nowrap; }
+
+        /* Copy Stats bar */
+        .copy-bar-wrap {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+        }
+        .copy-bar-label {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.7rem; letter-spacing: 1px;
+            min-width: 100px; color: var(--text);
+        }
+        .copy-bar-track {
+            flex: 1; height: 24px;
+            background: rgba(212,175,55,0.1);
+            border-radius: 12px; overflow: hidden;
+        }
+        .copy-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #f5d062);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: flex-end;
+            padding-right: 10px;
+            font-size: 0.7rem; font-weight: 700; color: #fff;
+            min-width: 30px;
+            transition: width 0.5s ease;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center; padding: 40px;
+            color: var(--text-light); font-style: italic;
+        }
+
+        /* Auth Gate */
+        .auth-gate {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; flex-direction: column; gap: 20px;
+        }
+        .auth-gate input {
+            padding: 14px 20px; border: 1px solid var(--border);
+            border-radius: 14px; font-family: 'Lora', serif;
+            font-size: 1rem; width: 280px; text-align: center;
+            background: var(--card-bg);
+        }
+        .auth-gate button {
+            padding: 14px 40px; background: var(--gold); color: #fff;
+            border: none; border-radius: 14px;
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.8rem; letter-spacing: 2px;
+            cursor: pointer;
+        }
+        .auth-gate h2 {
+            font-family: 'Alex Brush', cursive;
+            font-size: 2.5rem; color: var(--gold);
+        }
+
+        @media (max-width: 600px) {
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .data-table { font-size: 0.8rem; }
+            .panel-body { padding: 20px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div id="auth-gate" class="auth-gate">
+    <h2>Panel Admin</h2>
+    <p style="color:var(--text-light); font-size: 0.9rem;">Michelle & Mike — 21 Junio 2026</p>
+    <input type="password" id="auth-key" placeholder="Clave de acceso" onkeydown="if(event.key==='Enter')authenticate()">
+    <button onclick="authenticate()">Entrar</button>
+</div>
+
+<!-- Dashboard (hidden until auth) -->
+<div id="dashboard" style="display:none;">
+    <header class="panel-header">
+        <div>
+            <div class="panel-title">Panel Admin</div>
+            <div class="panel-subtitle">MICHELLE & MIKE — 21 JUNIO 2026</div>
+        </div>
+        <div class="refresh-info" id="refresh-info">Actualización automática</div>
+    </header>
+
+    <div class="panel-body">
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="stat-card">
+                <div class="stat-num" id="s-views">—</div>
+                <div class="stat-label">VISITAS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="s-rsvps">—</div>
+                <div class="stat-label">CONFIRMADOS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="s-guests">—</div>
+                <div class="stat-label">TOTAL INVITADOS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-num" id="s-maps">—</div>
+                <div class="stat-label">MAPAS ABIERTOS</div>
+            </div>
+        </div>
+
+        <!-- Bank Copy Stats -->
+        <div class="section-title"><i data-lucide="credit-card"></i> CUENTAS COPIADAS</div>
+        <div id="copy-stats" style="background: var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:20px; box-shadow: var(--shadow);"></div>
+
+        <!-- RSVP List -->
+        <div class="section-title"><i data-lucide="heart"></i> CONFIRMACIONES</div>
+        <table class="data-table" id="rsvp-table">
+            <thead><tr>
+                <th>NOMBRE</th>
+                <th>INVITADOS</th>
+                <th>MENSAJE</th>
+                <th>FECHA</th>
+            </tr></thead>
+            <tbody id="rsvp-body"></tbody>
+        </table>
+
+        <!-- Recent Events -->
+        <div class="section-title"><i data-lucide="activity"></i> ACTIVIDAD RECIENTE</div>
+        <table class="data-table" id="events-table">
+            <thead><tr>
+                <th>TIPO</th>
+                <th>DETALLE</th>
+                <th>FECHA</th>
+            </tr></thead>
+            <tbody id="events-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let adminKey = '';
+
+    function authenticate() {
+        adminKey = document.getElementById('auth-key').value;
+        loadStats().then(ok => {
+            if (ok) {
+                document.getElementById('auth-gate').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                lucide.createIcons();
+                // Auto-refresh every 30s
+                setInterval(loadStats, 30000);
+            } else {
+                alert('Clave incorrecta');
+            }
+        });
+    }
+
+    async function loadStats() {
+        try {
+            const res = await fetch(`/api/stats?key=${encodeURIComponent(adminKey)}`);
+            if (!res.ok) return false;
+            const data = await res.json();
+            render(data);
+            document.getElementById('refresh-info').innerText = `Última actualización: ${new Date().toLocaleTimeString()}`;
+            return true;
+        } catch(e) {
+            return false;
+        }
+    }
+
+    const eventLabels = {
+        'page_view': '👁️ Vista de página',
+        'copy_account': '📋 Cuenta copiada',
+        'rsvp_open': '📝 Modal RSVP abierto',
+        'rsvp_confirm': '✅ RSVP Confirmado',
+        'open_map': '🗺️ Mapa abierto'
+    };
+
+    function render(data) {
+        const s = data.summary;
+        document.getElementById('s-views').innerText = s.totalViews;
+        document.getElementById('s-rsvps').innerText = s.totalRsvps;
+        document.getElementById('s-guests').innerText = s.totalGuests;
+        document.getElementById('s-maps').innerText = s.mapClicks;
+
+        // Copy Stats bars
+        const copyEl = document.getElementById('copy-stats');
+        if (s.copyCounts && s.copyCounts.length > 0) {
+            const maxCount = Math.max(...s.copyCounts.map(c => c.count));
+            copyEl.innerHTML = s.copyCounts.map(c => `
+                <div class="copy-bar-wrap">
+                    <span class="copy-bar-label">${c.bank || 'Desconocido'}</span>
+                    <div class="copy-bar-track">
+                        <div class="copy-bar-fill" style="width:${(c.count/maxCount)*100}%">${c.count}</div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            copyEl.innerHTML = '<p class="empty-state">Aún sin copias registradas</p>';
+        }
+
+        // RSVP table
+        const rsvpBody = document.getElementById('rsvp-body');
+        if (data.rsvps.length === 0) {
+            rsvpBody.innerHTML = '<tr><td colspan="4" class="empty-state">Aún sin confirmaciones</td></tr>';
+        } else {
+            rsvpBody.innerHTML = data.rsvps.map(r => `
+                <tr>
+                    <td><strong>${escHtml(r.name)}</strong></td>
+                    <td><span class="badge">${r.guests}</span></td>
+                    <td class="msg-cell">${escHtml(r.message) || '—'}</td>
+                    <td class="time-cell">${formatDate(r.created_at)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Events table (last 50)
+        const evBody = document.getElementById('events-body');
+        const recent = data.events.slice(0, 50);
+        if (recent.length === 0) {
+            evBody.innerHTML = '<tr><td colspan="3" class="empty-state">Sin actividad</td></tr>';
+        } else {
+            evBody.innerHTML = recent.map(e => {
+                let detail = '';
+                try {
+                    const meta = JSON.parse(e.meta || '{}');
+                    if (meta.bank) detail = meta.bank;
+                    if (meta.name) detail = meta.name;
+                } catch(x) {}
+                return `
+                    <tr>
+                        <td>${eventLabels[e.type] || e.type}</td>
+                        <td>${escHtml(detail) || '—'}</td>
+                        <td class="time-cell">${formatDate(e.created_at)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.innerText = str;
+        return div.innerHTML;
+    }
+
+    function formatDate(d) {
+        if (!d) return '—';
+        const dt = new Date(d);
+        return dt.toLocaleDateString('es-DO', { day:'numeric', month:'short', year:'numeric' }) + ' ' + dt.toLocaleTimeString('es-DO', { hour:'2-digit', minute:'2-digit' });
+    }
+</script>
+</body>
+</html>
