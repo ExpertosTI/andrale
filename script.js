@@ -157,10 +157,12 @@ const animate = () => {
                 section.style.transform = `scale(${scale}) translateY(${dist * 40}px)`;
                 section.style.pointerEvents = opacity > 0.4 ? 'auto' : 'none';
                 
-                // Don't auto-reveal 'intro' text, we handle that manually now.
+                // Reveal both immersive and standard fade-in texts
                 section.querySelectorAll('[data-immersive-text]:not([data-immersive-text="intro"])').forEach(t => t.classList.toggle('is-visible', opacity > 0.5));
+                section.querySelectorAll('.fade-in-text').forEach(t => t.classList.toggle('is-visible', opacity > 0.6));
             } else {
                 section.style.opacity = '0';
+                section.querySelectorAll('.fade-in-text').forEach(t => t.classList.remove('is-visible'));
             }
         });
     }
@@ -201,6 +203,11 @@ const playIntroTyping = () => {
     // Ensure parent section forces opacity 1 for the hero text manually
     const heroSection = document.getElementById('hero');
     if (heroSection) heroSection.style.opacity = '1';
+    
+    // Also trigger any non-immersive fade-in text in the hero section
+    setTimeout(() => {
+        if (heroSection) heroSection.querySelectorAll('.fade-in-text').forEach(t => t.classList.add('is-visible'));
+    }, 1500); 
 };
 
 const startExperience = () => {
@@ -223,9 +230,6 @@ const startExperience = () => {
             setTimeout(() => introVideoWrap.style.display = 'none', 1600);
         }, 800);
     }
-    
-    // We no longer trigger playIntroTyping() here immediately.
-    // It will be triggered when scrolling reaches the last 4 seconds of intro-video.
 };
 
 entranceOverlay.addEventListener('click', startExperience);
@@ -236,24 +240,6 @@ window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { pa
 initParticles();
 animate();
 prepareImmersiveText();
-
-const updateCountdown = () => {
-    const weddingDate = new Date('June 21, 2026 20:00:00').getTime();
-    const now = new Date().getTime();
-    const distance = Math.max(0, weddingDate - now);
-    const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const s = Math.floor((distance % (1000 * 60)) / 1000);
-
-    const ids = ['days', 'hours', 'minutes', 'seconds'];
-    [d, h, m, s].forEach((val, i) => {
-        const el = document.getElementById(ids[i]);
-        if (el) el.innerText = val.toString().padStart(2, '0');
-    });
-};
-setInterval(updateCountdown, 1000);
-updateCountdown();
 
 window.copyToClipboard = (text, bankName) => {
     navigator.clipboard.writeText(text).then(() => {

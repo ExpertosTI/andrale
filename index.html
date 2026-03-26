@@ -50,12 +50,13 @@
             <div class="hero-content">
                 <h1 class="hero-names" data-immersive-text="intro">Michelle & Mike</h1>
                 <div class="hero-separator"></div>
-                <p class="hero-quote" data-immersive-text>
+                <!-- Removed immersive-text from quote to ensure it renders perfectly on mobile -->
+                <p class="hero-quote fade-in-text">
                     "Hermanos, den gracias a Dios por todo, porque esto es lo que Él quiere de ustedes como creyentes en Cristo Jesús."<br>
                     <span>1 Tesalonicenses 5:18</span>
                 </p>
-                <div class="hero-date" data-immersive-text>21 DE JUNIO, 2026</div>
-                <div class="scroll-indicator"><div class="arrow"></div></div>
+                <div class="hero-date fade-in-text">21 DE JUNIO, 2026</div>
+                <div class="scroll-indicator fade-in-text"><div class="arrow"></div></div>
             </div>
         </section>
 
@@ -66,18 +67,18 @@
                     <i data-lucide="map-pin" class="card-icon"></i>
                 </div>
                 <h2 data-immersive-text="section">La Recepción</h2>
-                <div class="detail-grid">
+                <div class="detail-grid fade-in-text">
                     <div class="grid-item">
-                        <span class="label">DÓNDE</span>
+                        <span class="label">LUGAR</span>
                         <p class="value">Distric event venue</p>
                     </div>
                     <div class="grid-item">
-                        <span class="label">CUÁNDO</span>
+                        <span class="label">HORA</span>
                         <p class="value">8:00 PM</p>
                     </div>
                 </div>
-                <p class="address" data-immersive-text="section">Frank Felix Miranda No. 5 naco, Sto.Dgo</p>
-                <div class="map-links">
+                <p class="address fade-in-text">Frank Felix Miranda No. 5 naco, Sto.Dgo</p>
+                <div class="map-links fade-in-text">
                     <a href="https://www.google.com/maps/search/?api=1&query=Frank+Felix+Miranda+No.+5+naco+Santo+Domingo" target="_blank" class="btn-map" title="Google Maps">
                         <i data-lucide="map"></i>
                     </a>
@@ -102,13 +103,13 @@
                 </div>
                 <h2 data-immersive-text="section">Código de Vestimenta</h2>
                 <p class="style-title" data-immersive-text="section">FORMAL</p>
-                <div class="style-warning" data-immersive-text="section">
+                <div class="style-warning fade-in-text">
                     <span class="warning-dim">Evitar el color </span>
                     <span class="warning-bold">rojo</span>
                     <span class="warning-dim">, por favor.</span>
                 </div>
-                <div class="divider"></div>
-                <div class="no-kids" data-immersive-text="section">
+                <div class="divider fade-in-text"></div>
+                <div class="no-kids fade-in-text">
                     <i data-lucide="baby" class="icon-forbidden"></i>
                     <p>Evento solo para adultos</p>
                 </div>
@@ -122,8 +123,8 @@
                     <i data-lucide="gift" class="card-icon"></i>
                 </div>
                 <h2 data-immersive-text="section">Regalos</h2>
-                <p class="gift-intro" data-immersive-text="section">Si desea hacernos un obsequio, estas son nuestras cuentas:</p>
-                <div class="account-list">
+                <p class="gift-intro fade-in-text">Si desea hacernos un obsequio, estas son nuestras cuentas:</p>
+                <div class="account-list fade-in-text">
                     <div class="account-item" onclick="copyToClipboard('23054590023', 'BHD')">
                         <div class="bank-wrap"><span class="bank">BHD</span></div>
                         <span class="acc-num">23054590023</span>
@@ -140,44 +141,13 @@
                         <i data-lucide="copy" class="icon-copy"></i>
                     </div>
                 </div>
-                <div class="holder-info">
+                <div class="holder-info fade-in-text">
                     <strong>Michelle Domínguez</strong><br>
                     Cédula: 402-2449863-0
                 </div>
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="section enterprise-footer" id="footer">
-            <div class="footer-corporate">
-                <div class="footer-top">
-                    <div class="footer-brand">
-                        <span class="brand-name">Michelle & Mike</span>
-                        <span class="brand-tag">BODA MMXXVI</span>
-                    </div>
-                    <div class="footer-links">
-                        <a href="#hero" class="f-link">Inicio</a>
-                        <a href="#details" class="f-link">Ubicación</a>
-                        <a href="#gifts" class="f-link">Regalos</a>
-                    </div>
-                </div>
-                <div class="footer-mid">
-                    <div class="countdown-mini" id="countdown">
-                        <div class="c-unit"><span id="days">00</span><label>DÍAS</label></div>
-                        <div class="c-unit"><span id="hours">00</span><label>HRS</label></div>
-                        <div class="c-unit"><span id="minutes">00</span><label>MIN</label></div>
-                        <div class="c-unit"><span id="seconds">00</span><label>SEG</label></div>
-                    </div>
-                </div>
-                <div class="footer-quote">
-                    <p class="final-msg">"El <span class="highlight">amor</span> incondicional y el compromiso <span class="highlight">eterno</span>."</p>
-                </div>
-                <div class="footer-bottom">
-                    <div class="legal"><p>&copy; 2026 Renace Technology Solutions.</p></div>
-                    <div class="expertos-credit">Power by <a href="https://expertosti.com" target="_blank">ExpertosTI</a></div>
-                </div>
-            </div>
-        </footer>
     </main>
 
     <div id="toast" class="toast">¡Copiado!</div>
@@ -186,3 +156,4 @@
     <script>lucide.createIcons();</script>
 </body>
 </html>
+
