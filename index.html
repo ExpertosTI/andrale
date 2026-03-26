@@ -4,66 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Boda de Michelle y Mike - 21 Junio 2026</title>
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&family=Alex+Brush&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.525.0"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="locked">
+
+    <!-- Entrance: Tap anywhere to enter (no button) -->
     <div class="entrance-overlay" id="entrance-overlay">
         <div class="entrance-info">
             <h1 class="entrance-names" data-immersive-text="intro">Michelle & Mike</h1>
             <p class="entrance-date">21 DE JUNIO, 2026</p>
-            <div class="enter-btn-wrap">
-                <button class="enter-btn">VER INVITACIÓN</button>
-            </div>
+            <p class="entrance-hint">Toca para abrir</p>
         </div>
     </div>
 
+    <!-- Intro Video (scroll-scrubbed portal) -->
     <video id="intro-scrub-video" muted playsinline class="bg-video intro-scrub" preload="auto">
         <source src="assets/intro.mov" type="video/quicktime">
         <source src="assets/intro.mov" type="video/mp4">
     </video>
 
+    <!-- Background Video (scroll-scrubbed atmosphere) -->
     <video id="bg-video" muted loop playsinline class="bg-video" preload="auto">
         <source src="assets/bg.mov" type="video/quicktime">
         <source src="assets/bg.mov" type="video/mp4">
     </video>
 
-    <div class="silk-texture"></div>
+    <!-- Gold Dust Canvas -->
+    <canvas id="canvas"></canvas>
+    <div class="scroll-progress" id="scroll-progress"></div>
 
+    <!-- Intro GIF Wrap (shown briefly on entry) -->
     <div id="intro-video-wrap" class="intro-video-wrap">
         <img id="intro-video" class="intro-video" src="assets/intro.gif" alt="Boda Michelle y Mike">
     </div>
 
-    <canvas id="canvas"></canvas>
-    <div class="scroll-progress" id="scroll-progress"></div>
-
-    <!-- Main Invitation Content -->
+    <!-- Main Content -->
     <main id="main-content">
-        <!-- Hero Section -->
-        <section class="section active" id="hero">
+
+        <!-- Hero -->
+        <section class="section" id="hero">
             <div class="hero-content">
-                <!-- Names First for Impact -->
                 <h1 class="hero-names" data-immersive-text="intro">Michelle & Mike</h1>
                 <div class="hero-separator"></div>
-                
                 <p class="hero-quote" data-immersive-text>
                     "Hermanos, den gracias a Dios por todo, porque esto es lo que Él quiere de ustedes como creyentes en Cristo Jesús."<br>
                     <span>1 Tesalonicenses 5:18</span>
                 </p>
-                <div class="hero-date">21 DE JUNIO, 2026</div>
-                <div class="scroll-indicator">
-                    <div class="arrow"></div>
-                </div>
+                <div class="hero-date" data-immersive-text>21 DE JUNIO, 2026</div>
+                <div class="scroll-indicator"><div class="arrow"></div></div>
             </div>
         </section>
 
-        <!-- Details Section -->
+        <!-- Reception -->
         <section class="section details" id="details">
-            <div class="glass-card saga-card" data-tilt>
+            <div class="glass-card saga-card">
                 <div class="icon-center-wrap">
                     <i data-lucide="map-pin" class="card-icon"></i>
                 </div>
@@ -93,9 +91,9 @@
             </div>
         </section>
 
-        <!-- Rules & Dress Code -->
+        <!-- Dress Code -->
         <section class="section rules" id="rules">
-            <div class="glass-card saga-card" data-tilt>
+            <div class="glass-card saga-card">
                 <div class="icon-center-wrap">
                     <div class="dress-code-icons">
                         <i data-lucide="shirt" class="card-icon icon-dress-1"></i>
@@ -117,34 +115,27 @@
             </div>
         </section>
 
-        <!-- Gifts Section -->
+        <!-- Gifts -->
         <section class="section gifts" id="gifts">
-            <div class="glass-card saga-card" data-tilt>
+            <div class="glass-card saga-card">
                 <div class="icon-center-wrap">
                     <i data-lucide="gift" class="card-icon"></i>
                 </div>
                 <h2 data-immersive-text="section">Regalos</h2>
                 <p class="gift-intro" data-immersive-text="section">Si desea hacernos un obsequio, estas son nuestras cuentas:</p>
-                
                 <div class="account-list">
                     <div class="account-item" onclick="copyToClipboard('23054590023', 'BHD')">
-                        <div class="bank-wrap">
-                            <span class="bank">BHD</span>
-                        </div>
+                        <div class="bank-wrap"><span class="bank">BHD</span></div>
                         <span class="acc-num">23054590023</span>
                         <i data-lucide="copy" class="icon-copy"></i>
                     </div>
                     <div class="account-item" onclick="copyToClipboard('843559659', 'Popular')">
-                        <div class="bank-wrap">
-                            <span class="bank">Popular</span>
-                        </div>
+                        <div class="bank-wrap"><span class="bank">Popular</span></div>
                         <span class="acc-num">843559659</span>
                         <i data-lucide="copy" class="icon-copy"></i>
                     </div>
                     <div class="account-item" onclick="copyToClipboard('9607216343', 'Banreservas')">
-                        <div class="bank-wrap">
-                            <span class="bank">Banreservas</span>
-                        </div>
+                        <div class="bank-wrap"><span class="bank">Banreservas</span></div>
                         <span class="acc-num">9607216343</span>
                         <i data-lucide="copy" class="icon-copy"></i>
                     </div>
@@ -156,7 +147,7 @@
             </div>
         </section>
 
-        <!-- Enterprise Footer -->
+        <!-- Footer -->
         <footer class="section enterprise-footer" id="footer">
             <div class="footer-corporate">
                 <div class="footer-top">
@@ -164,14 +155,12 @@
                         <span class="brand-name">Michelle & Mike</span>
                         <span class="brand-tag">BODA MMXXVI</span>
                     </div>
-                    <div class="footer-divider"></div>
                     <div class="footer-links">
                         <a href="#hero" class="f-link">Inicio</a>
                         <a href="#details" class="f-link">Ubicación</a>
                         <a href="#gifts" class="f-link">Regalos</a>
                     </div>
                 </div>
-                
                 <div class="footer-mid">
                     <div class="countdown-mini" id="countdown">
                         <div class="c-unit"><span id="days">00</span><label>DÍAS</label></div>
@@ -180,18 +169,12 @@
                         <div class="c-unit"><span id="seconds">00</span><label>SEG</label></div>
                     </div>
                 </div>
-
                 <div class="footer-quote">
                     <p class="final-msg">"El <span class="highlight">amor</span> incondicional y el compromiso <span class="highlight">eterno</span>."</p>
                 </div>
-
                 <div class="footer-bottom">
-                    <div class="legal">
-                        <p>&copy; 2026 Renace Technology Solutions. Todos los derechos reservados.</p>
-                    </div>
-                    <div class="expertos-credit">
-                        Power by <a href="https://expertosti.com" target="_blank">ExpertosTI</a>
-                    </div>
+                    <div class="legal"><p>&copy; 2026 Renace Technology Solutions.</p></div>
+                    <div class="expertos-credit">Power by <a href="https://expertosti.com" target="_blank">ExpertosTI</a></div>
                 </div>
             </div>
         </footer>
@@ -200,8 +183,6 @@
     <div id="toast" class="toast">¡Copiado!</div>
 
     <script src="script.js"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
