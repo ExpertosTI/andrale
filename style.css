@@ -88,6 +88,9 @@ body.locked { overflow: hidden; height: 100vh; }
     /* Extra dense sepia to completely kill blue silk tones and force champagne */
     filter: sepia(0.55) saturate(1.8) hue-rotate(-15deg) contrast(1.15) brightness(1.05);
 }
+#bg-video {
+    filter: sepia(0.5) hue-rotate(-5deg) saturate(0.6) brightness(1.6) contrast(0.9);
+}
 .bg-video.is-visible { opacity: 1; }
 .intro-scrub { 
     z-index: -1; 
@@ -198,9 +201,12 @@ body.locked { overflow: hidden; height: 100vh; }
 }
 .hero-date {
     font-family: 'Syncopate', sans-serif;
-    font-size: 0.8rem; letter-spacing: 0.3em;
-    color: var(--accent-gold); margin-top: 2rem;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    font-size: clamp(1rem, 3.5vw, 1.4rem); 
+    letter-spacing: 0.3em;
+    font-weight: 700;
+    color: var(--accent-gold); 
+    margin-top: 4rem;
+    text-shadow: 0 2px 15px rgba(0,0,0,0.8);
 }
 
 /* Scroll Hint Overlay */

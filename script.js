@@ -164,8 +164,14 @@ const animate = () => {
                 }
             }
         } else {
-            // Beyond introZone, show looping BG particles
-            if (bgVideo) bgVideo.classList.add('is-visible');
+            // Beyond introZone, scrub the second BG video
+            if (bgVideo && !isNaN(bgVideo.duration)) {
+                const bgScrollRange = scrollMax - introZone;
+                const currentBgScroll = currentScroll - introZone;
+                const bgRatio = Math.max(0, currentBgScroll / bgScrollRange);
+                bgVideo.currentTime = bgRatio * (bgVideo.duration - 0.05);
+                bgVideo.classList.add('is-visible');
+            }
             if (introVideoScrub) introVideoScrub.classList.remove('is-visible');
             
             // Ensure Hero is hidden
@@ -197,6 +203,14 @@ const animate = () => {
                 section.style.transform = `scale(${scale}) translateY(${dist * 40}px)`;
                 section.style.pointerEvents = opacity > 0.4 ? 'auto' : 'none';
                 
+                // Haptic bump when section centers
+                if (opacity > 0.85 && section.dataset.bumped !== "true") {
+                    if (navigator.vibrate) navigator.vibrate(10);
+                    section.dataset.bumped = "true";
+                } else if (opacity < 0.5) {
+                    section.dataset.bumped = "false";
+                }
+
                 // Reveal immersive and standard fade-in texts inside section
                 section.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.toggle('is-visible', opacity > 0.5));
                 section.querySelectorAll('.fade-in-text').forEach(t => t.classList.toggle('is-visible', opacity > 0.6));
@@ -262,6 +276,7 @@ initParticles();
 animate();
 
 window.copyToClipboard = (text, bankName) => {
+    if (navigator.vibrate) navigator.vibrate([15, 30, 15]);
     navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('toast');
         if (toast) {
