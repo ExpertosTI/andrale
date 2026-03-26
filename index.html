@@ -12,12 +12,13 @@
 </head>
 <body class="locked">
 
-    <!-- Entrance: Tap anywhere to enter (no button) -->
+    <!-- Entrance: Clean prompt, no names/date -->
     <div class="entrance-overlay" id="entrance-overlay">
         <div class="entrance-info">
-            <h1 class="entrance-names" data-immersive-text="intro">Michelle & Mike</h1>
-            <p class="entrance-date">21 DE JUNIO, 2026</p>
-            <p class="entrance-hint">Toca para abrir</p>
+            <div class="entrance-hint pulse-anim">
+                <i data-lucide="hand" style="width: 48px; height: 48px; color: var(--accent-gold); margin-bottom: 15px;"></i>
+                <p style="letter-spacing: 4px; font-size: 0.85rem; font-family: 'Syncopate', sans-serif;">TOCAR PARA ENTRAR</p>
+            </div>
         </div>
     </div>
 
@@ -37,57 +38,49 @@
     <canvas id="canvas"></canvas>
     <div class="scroll-progress" id="scroll-progress"></div>
 
-    <!-- Intro GIF Wrap (shown briefly on entry) -->
+    <!-- Intro GIF Wrap (shown briefly on entry form background seamless transition) -->
     <div id="intro-video-wrap" class="intro-video-wrap">
         <img id="intro-video" class="intro-video" src="assets/intro.gif" alt="Boda Michelle y Mike">
     </div>
 
     <!-- Main Content -->
     <main id="main-content">
+        <!-- Empty Space: Allows user to scroll through the intro video purely clean -->
+        <div id="intro-pacer" style="height: 120vh; width: 100%; pointer-events: none;"></div>
 
-        <!-- Hero -->
+        <!-- Hero: Now appears over the SECOND video frame -->
         <section class="section" id="hero">
             <div class="hero-content">
-                <h1 class="hero-names" data-immersive-text="intro">Michelle & Mike</h1>
+                <h1 class="hero-names" id="data-hero-names" data-immersive-text="intro"></h1>
                 <div class="hero-separator"></div>
-                <!-- Removed immersive-text from quote to ensure it renders perfectly on mobile -->
-                <p class="hero-quote fade-in-text">
-                    "Hermanos, den gracias a Dios por todo, porque esto es lo que Él quiere de ustedes como creyentes en Cristo Jesús."<br>
-                    <span>1 Tesalonicenses 5:18</span>
-                </p>
-                <div class="hero-date fade-in-text">21 DE JUNIO, 2026</div>
+                <p class="hero-quote fade-in-text" id="data-hero-verse"></p>
+                <div class="hero-date fade-in-text" id="data-hero-date"></div>
                 <div class="scroll-indicator fade-in-text"><div class="arrow"></div></div>
             </div>
         </section>
 
-        <!-- Reception -->
+        <!-- Reception (Data sourced from data.js) -->
         <section class="section details" id="details">
             <div class="glass-card saga-card">
                 <div class="icon-center-wrap">
                     <i data-lucide="map-pin" class="card-icon"></i>
                 </div>
-                <h2 data-immersive-text="section">La Recepción</h2>
+                <h2 data-immersive-text="section" id="data-reception-title"></h2>
                 <div class="detail-grid fade-in-text">
                     <div class="grid-item">
                         <span class="label">LUGAR</span>
-                        <p class="value">Distric event venue</p>
+                        <p class="value" id="data-reception-place"></p>
                     </div>
                     <div class="grid-item">
                         <span class="label">HORA</span>
-                        <p class="value">8:00 PM</p>
+                        <p class="value" id="data-reception-time"></p>
                     </div>
                 </div>
-                <p class="address fade-in-text">Frank Felix Miranda No. 5 naco, Sto.Dgo</p>
+                <p class="address fade-in-text" id="data-reception-address"></p>
                 <div class="map-links fade-in-text">
-                    <a href="https://www.google.com/maps/search/?api=1&query=Frank+Felix+Miranda+No.+5+naco+Santo+Domingo" target="_blank" class="btn-map" title="Google Maps">
-                        <i data-lucide="map"></i>
-                    </a>
-                    <a href="https://ul.waze.com/ul?ll=18.4719,-69.9333&navigate=yes" target="_blank" class="btn-map" title="Waze">
-                        <i data-lucide="navigation"></i>
-                    </a>
-                    <a href="maps://?q=Frank+Felix+Miranda+No.+5+naco+Santo+Domingo" class="btn-map" title="Apple Maps">
-                        <i data-lucide="map-pin"></i>
-                    </a>
+                    <a href="javascript:void(0)" onclick="window.open(weddingData.reception.map_google, '_blank')" class="btn-map" title="Google Maps"><i data-lucide="map"></i></a>
+                    <a href="javascript:void(0)" onclick="window.open(weddingData.reception.map_waze, '_blank')" class="btn-map" title="Waze"><i data-lucide="navigation"></i></a>
+                    <a href="javascript:void(0)" onclick="window.location.href = weddingData.reception.map_apple" class="btn-map" title="Apple Maps"><i data-lucide="map-pin"></i></a>
                 </div>
             </div>
         </section>
@@ -101,17 +94,13 @@
                         <i data-lucide="sparkles" class="card-icon icon-dress-2"></i>
                     </div>
                 </div>
-                <h2 data-immersive-text="section">Código de Vestimenta</h2>
-                <p class="style-title" data-immersive-text="section">FORMAL</p>
-                <div class="style-warning fade-in-text">
-                    <span class="warning-dim">Evitar el color </span>
-                    <span class="warning-bold">rojo</span>
-                    <span class="warning-dim">, por favor.</span>
-                </div>
+                <h2 data-immersive-text="section" id="data-dress-title"></h2>
+                <p class="style-title" data-immersive-text="section" id="data-dress-style"></p>
+                <div class="style-warning fade-in-text" id="data-dress-warning"></div>
                 <div class="divider fade-in-text"></div>
                 <div class="no-kids fade-in-text">
                     <i data-lucide="baby" class="icon-forbidden"></i>
-                    <p>Evento solo para adultos</p>
+                    <p id="data-dress-kids"></p>
                 </div>
             </div>
         </section>
@@ -122,29 +111,17 @@
                 <div class="icon-center-wrap">
                     <i data-lucide="gift" class="card-icon"></i>
                 </div>
-                <h2 data-immersive-text="section">Regalos</h2>
-                <p class="gift-intro fade-in-text">Si desea hacernos un obsequio, estas son nuestras cuentas:</p>
-                <div class="account-list fade-in-text">
-                    <div class="account-item" onclick="copyToClipboard('23054590023', 'BHD')">
-                        <div class="bank-wrap"><span class="bank">BHD</span></div>
-                        <span class="acc-num">23054590023</span>
-                        <i data-lucide="copy" class="icon-copy"></i>
-                    </div>
-                    <div class="account-item" onclick="copyToClipboard('843559659', 'Popular')">
-                        <div class="bank-wrap"><span class="bank">Popular</span></div>
-                        <span class="acc-num">843559659</span>
-                        <i data-lucide="copy" class="icon-copy"></i>
-                    </div>
-                    <div class="account-item" onclick="copyToClipboard('9607216343', 'Banreservas')">
-                        <div class="bank-wrap"><span class="bank">Banreservas</span></div>
-                        <span class="acc-num">9607216343</span>
-                        <i data-lucide="copy" class="icon-copy"></i>
-                    </div>
+                <h2 data-immersive-text="section" id="data-gifts-title"></h2>
+                <p class="gift-intro fade-in-text" id="data-gifts-message"></p>
+                
+                <div class="account-list fade-in-text" id="data-gifts-accounts">
+                    <!-- Populated by data.js -->
                 </div>
-                <div class="holder-info fade-in-text">
-                    <strong>Michelle Domínguez</strong><br>
-                    Cédula: 402-2449863-0
-                </div>
+
+                <div class="holder-info fade-in-text" id="data-gifts-holder"></div>
+                
+                <p class="gift-intro fade-in-text" id="data-closing-message" style="margin-top: 35px; font-style: italic; opacity: 0.9; text-align: center; color: var(--text-bold);"></p>
+
             </div>
         </section>
 
@@ -152,6 +129,7 @@
 
     <div id="toast" class="toast">¡Copiado!</div>
 
+    <script src="data.js"></script>
     <script src="script.js"></script>
     <script>lucide.createIcons();</script>
 </body>

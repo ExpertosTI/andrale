@@ -119,7 +119,7 @@ const animate = () => {
             progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
         }
 
-        const introZone = vh * 1.5;
+        const introZone = vh * 1.0; // Sped up the transition significantly
         
         if (currentScroll < introZone) {
             if (introVideoScrub && !isNaN(introVideoScrub.duration)) {
