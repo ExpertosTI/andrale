@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hero
     setHtml('data-hero-names', weddingData.hero.names);
-    setHtml('data-hero-verse', `${weddingData.hero.verse}<br><span>${weddingData.hero.verse_book}</span>`);
+    setText('data-hero-verse', weddingData.hero.verse);
+    setText('data-hero-verse-book', weddingData.hero.verse_book);
     setText('data-hero-date', weddingData.hero.date);
 
     // Reception

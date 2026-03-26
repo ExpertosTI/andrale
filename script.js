@@ -13,7 +13,7 @@ const introVideoWrap = document.getElementById('intro-video-wrap');
 const entranceOverlay = document.getElementById('entrance-overlay');
 
 let particles = [];
-const particleCount = 450; 
+const particleCount = 800; // Intensely dense gold dust for strong 'life' effect
 let experienceStarted = false;
 let targetScroll = 0;
 let currentScroll = 0;
@@ -112,8 +112,8 @@ class Particle {
 
 const initParticles = () => {
     particles = [];
-    // Dense dust, slightly reduced on mobile
-    const count = window.innerWidth < 600 ? 250 : particleCount;
+    // Dense dust, extremely high count for active life
+    const count = window.innerWidth < 600 ? 550 : particleCount;
     for (let i = 0; i < count; i += 1) {
         particles.push(new Particle());
     }
@@ -138,40 +138,66 @@ const animate = () => {
             progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
         }
 
-        const introZone = vh * 1.0; // Sped up the transition significantly
+        const introZone = vh * 1.4; // Slightly longer scroll for intro
         
         if (currentScroll < introZone) {
             if (introVideoScrub && !isNaN(introVideoScrub.duration)) {
+                // Ensure bgVideo is hidden during intro seal
+                if (bgVideo && bgVideo.classList.contains('is-visible')) bgVideo.classList.remove('is-visible');
+
                 const ratio = Math.max(0, currentScroll / introZone);
                 introVideoScrub.currentTime = ratio * (introVideoScrub.duration - 0.05);
                 introVideoScrub.classList.add('is-visible');
 
+                // Fixed Hero Overlay Logic: Appears between 60% and 130% of the introZone scroll
+                const hero = document.getElementById('hero-overlay');
+                if (hero) {
+                    if (ratio > 0.6 && ratio < 1.3) {
+                        hero.classList.add('is-visible');
+                        hero.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.add('is-visible'));
+                        hero.querySelectorAll('.fade-in-text').forEach(t => t.classList.add('is-visible'));
+                    } else {
+                        hero.classList.remove('is-visible');
+                        hero.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.remove('is-visible'));
+                        hero.querySelectorAll('.fade-in-text').forEach(t => t.classList.remove('is-visible'));
+                    }
+                }
             }
-            if (bgVideo) bgVideo.classList.remove('is-visible');
         } else {
-            if (bgVideo && !isNaN(bgVideo.duration)) {
-                const bgRatio = Math.max(0, (currentScroll - introZone) / (scrollMax - introZone));
-                bgVideo.currentTime = bgRatio * (bgVideo.duration - 0.05);
-                bgVideo.classList.add('is-visible');
-            }
+            // Beyond introZone, show looping BG particles
+            if (bgVideo) bgVideo.classList.add('is-visible');
             if (introVideoScrub) introVideoScrub.classList.remove('is-visible');
+            
+            // Ensure Hero is hidden
+            const hero = document.getElementById('hero-overlay');
+            if (hero) {
+                hero.classList.remove('is-visible');
+                hero.querySelectorAll('.is-visible').forEach(t => t.classList.remove('is-visible'));
+            }
         }
 
-        // Section Reveal logic
+        // Hide scroll prompt once user starts scrolling
+        const scrollPrompt = document.getElementById('initial-scroll-prompt');
+        if (scrollPrompt) {
+            if (currentScroll > 50) scrollPrompt.classList.add('is-hidden');
+            else scrollPrompt.classList.remove('is-hidden');
+        }
+
+        // Section Reveal logic (details, rules, gifts)
         sections.forEach((section) => {
             const rect = section.getBoundingClientRect();
             const center = rect.top + rect.height / 2;
             const dist = (center - vh / 2) / (vh * 0.75);
             const absDist = Math.abs(dist);
             
-            if (absDist < 1.2) {
+            if (absDist < 1.3) {
                 const opacity = Math.max(0, 1 - Math.pow(absDist, 1.8));
                 const scale = 0.94 + (0.06 * opacity);
                 section.style.opacity = opacity;
                 section.style.transform = `scale(${scale}) translateY(${dist * 40}px)`;
                 section.style.pointerEvents = opacity > 0.4 ? 'auto' : 'none';
                 
-                // Reveal all immersive texts inside
+                // Reveal immersive and standard fade-in texts inside section
                 section.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.toggle('is-visible', opacity > 0.5));
                 section.querySelectorAll('.fade-in-text').forEach(t => t.classList.toggle('is-visible', opacity > 0.6));
             } else {
@@ -206,42 +232,9 @@ const prepareImmersiveText = () => {
     });
 };
 
-const startExperience = () => {
-    if (experienceStarted) return;
-    logger('Experience START triggered by user');
-    experienceStarted = true;
-
-    entranceOverlay.classList.add('is-hidden');
-    document.body.classList.remove('locked');
-    document.body.style.overflow = 'auto';
-    document.body.style.height = 'auto';
-    
-    // Kickstart videos (if not already loading/ready)
-    if (introVideoScrub) {
-        logger('Triggering Intro Video Load/Play');
-        introVideoScrub.play().then(() => {
-            introVideoScrub.pause(); // Just to ensure it's "live" for scrubbing
-            logger('Intro Video active and paused for scrubbing');
-        });
-    }
-    if (bgVideo) bgVideo.play().catch(e => logger('BG Video play error: ' + e));
-
-    if (introVideoWrap) {
-        logger('Showing transition GIF');
-        introVideoWrap.classList.add('is-active');
-        setTimeout(() => {
-            logger('Fading out transition GIF');
-            introVideoWrap.style.opacity = '0';
-            setTimeout(() => {
-                introVideoWrap.style.display = 'none';
-                logger('Transition GIF hidden completely');
-            }, 1600);
-        }, 800);
-    }
-};
-
-entranceOverlay.addEventListener('click', startExperience);
-entranceOverlay.addEventListener('touchstart', startExperience, { passive: true });
+// Immediate start mode
+experienceStarted = true;
+document.body.classList.add('is-scrolling');
 
 window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { passive: true });
 

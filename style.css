@@ -145,13 +145,28 @@ body.locked { overflow: hidden; height: 100vh; }
 }
 
 /* ===================================
-   HERO
+   HERO OVERLAY (Fixed)
    =================================== */
+.fixed-hero {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    text-align: center;
+    width: 100%;
+}
+.fixed-hero.is-visible {
+    opacity: 1;
+}
+
 .hero-content {
-    position: relative; z-index: 2;
     max-width: 650px;
     padding: 30px;
     border-radius: 20px;
+    margin: 0 auto;
 }
 .hero-names {
     font-family: 'Alex Brush', cursive;
@@ -173,11 +188,13 @@ body.locked { overflow: hidden; height: 100vh; }
     line-height: 1.6; color: var(--text-light);
     text-shadow: 0 2px 15px rgba(0,0,0,0.8);
 }
-.hero-quote span {
+.hero-quote-book {
     display: block; margin-top: 0.8rem;
     font-family: 'Syncopate', sans-serif;
     font-size: 0.75rem; letter-spacing: 3px;
     font-style: normal; opacity: 0.9;
+    color: var(--text-light);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 .hero-date {
     font-family: 'Syncopate', sans-serif;
@@ -185,16 +202,23 @@ body.locked { overflow: hidden; height: 100vh; }
     color: var(--accent-gold); margin-top: 2rem;
     text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
-.scroll-indicator { margin-top: 3rem; }
-.scroll-indicator .arrow {
-    width: 2px; height: 50px;
-    background: linear-gradient(to bottom, var(--text-light), transparent);
-    margin: 0 auto;
-    animation: scrollBounce 2s ease-in-out infinite;
+
+/* Scroll Hint Overlay */
+.scroll-prompt {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
 }
-@keyframes scrollBounce {
-    0%, 100% { transform: translateY(0); opacity: 0.4; }
-    50% { transform: translateY(12px); opacity: 1; }
+.fade-out-on-scroll {
+    opacity: 1;
+}
+.fade-out-on-scroll.is-hidden {
+    opacity: 0;
 }
 
 /* ===================================

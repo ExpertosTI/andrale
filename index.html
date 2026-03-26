@@ -10,26 +10,26 @@
     <script src="https://unpkg.com/lucide@0.525.0"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="locked">
+<body class="is-scrolling">
 
-    <!-- Entrance: Clean prompt, no names/date -->
-    <div class="entrance-overlay" id="entrance-overlay">
-        <div class="entrance-info">
-            <div class="entrance-hint pulse-anim">
-                <i data-lucide="hand" style="width: 48px; height: 48px; color: var(--accent-gold); margin-bottom: 15px;"></i>
-                <p style="letter-spacing: 4px; font-size: 0.85rem; font-family: 'Syncopate', sans-serif;">TOCAR PARA ENTRAR</p>
+    <!-- Scroll Hint Overlay -->
+    <div id="initial-scroll-prompt" class="entrance-overlay" style="background: transparent; z-index: 10;">
+        <div class="entrance-info" style="margin-top: 15vh;">
+            <div class="entrance-hint pulse-anim" style="opacity: 0.9;">
+                <i data-lucide="chevrons-down" style="width: 48px; height: 48px; color: var(--accent-gold); margin-bottom: 15px;"></i>
+                <p style="letter-spacing: 4px; font-size: 0.85rem; font-family: 'Syncopate', sans-serif;">DESLIZA HACIA ABAJO</p>
             </div>
         </div>
     </div>
 
     <!-- Intro Video (scroll-scrubbed portal) -->
-    <video id="intro-scrub-video" muted playsinline class="bg-video intro-scrub" preload="auto">
+    <video id="intro-scrub-video" autoplay muted playsinline class="bg-video intro-scrub" preload="auto">
         <source src="assets/intro.mov" type="video/quicktime">
         <source src="assets/intro.mov" type="video/mp4">
     </video>
 
     <!-- Background Video (scroll-scrubbed atmosphere) -->
-    <video id="bg-video" muted loop playsinline class="bg-video" preload="auto">
+    <video id="bg-video" autoplay muted loop playsinline class="bg-video" preload="auto">
         <source src="assets/bg.mov" type="video/quicktime">
         <source src="assets/bg.mov" type="video/mp4">
     </video>
@@ -38,26 +38,20 @@
     <canvas id="canvas"></canvas>
     <div class="scroll-progress" id="scroll-progress"></div>
 
-    <!-- Intro GIF Wrap (shown briefly on entry form background seamless transition) -->
-    <div id="intro-video-wrap" class="intro-video-wrap">
-        <img id="intro-video" class="intro-video" src="assets/intro.gif" alt="Boda Michelle y Mike">
+    <!-- Hero Overlay: Fixed, controlled purely by scroll ratio -->
+    <div id="hero-overlay" class="hero-content fixed-hero">
+        <h1 class="hero-names" id="data-hero-names" data-immersive-text="fixed"></h1>
+        <div class="hero-separator fade-in-text"></div>
+        <p class="hero-quote" id="data-hero-verse" data-immersive-text="fixed"></p>
+        <p class="hero-quote-book fade-in-text" id="data-hero-verse-book"></p>
+        <div class="hero-date fade-in-text" id="data-hero-date"></div>
     </div>
 
     <!-- Main Content -->
     <main id="main-content">
-        <!-- Empty Space: Allows user to scroll through the intro video purely clean -->
-        <div id="intro-pacer" style="height: 120vh; width: 100%; pointer-events: none;"></div>
+        <!-- Pacer: determines how far we scroll through the intro video before details show -->
+        <div id="intro-pacer" style="height: 140vh; width: 100%; pointer-events: none;"></div>
 
-        <!-- Hero: Now appears over the SECOND video frame -->
-        <section class="section" id="hero">
-            <div class="hero-content">
-                <h1 class="hero-names" id="data-hero-names" data-immersive-text="intro"></h1>
-                <div class="hero-separator"></div>
-                <p class="hero-quote" id="data-hero-verse" data-immersive-text="intro"></p>
-                <div class="hero-date" id="data-hero-date" data-immersive-text="intro"></div>
-                <div class="scroll-indicator fade-in-text"><div class="arrow"></div></div>
-            </div>
-        </section>
 
         <!-- Reception (Data sourced from data.js) -->
         <section class="section details" id="details">
