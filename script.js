@@ -218,15 +218,18 @@ const startExperience = () => {
     experienceStarted = true;
 
     entranceOverlay.classList.add('is-hidden');
+    // Instant Unlock: Don't let the user feel "stuck" for 1.5s
     document.body.classList.remove('locked');
-    
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+
     // Transition Intro Wrap away
     if (introVideoWrap) {
         introVideoWrap.classList.add('is-active');
         setTimeout(() => {
             introVideoWrap.style.opacity = '0';
-            setTimeout(() => introVideoWrap.style.display = 'none', 1500);
-        }, 1000);
+            setTimeout(() => introVideoWrap.style.display = 'none', 1600);
+        }, 800);
     }
     
     playIntroTyping();

@@ -59,7 +59,7 @@ body.locked {
     background: #060a12;
     cursor: pointer;
     transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), transform 2s cubic-bezier(0.16, 1, 0.3, 1);
-    background: url('assets/cover.jpg') no-repeat center center / cover;
+    background: url('assets/cover_orig.jpg') no-repeat center center / cover;
     background-color: #000;
 }
 
@@ -213,12 +213,12 @@ body.locked {
     transition: opacity 1.5s ease;
 }
 
-/* Zero Noise Background Mask: Kills the 'sun' highlights in the video assets */
+/* Zero Noise Background Mask: Definitive kill of 'sun' bokeh highlights */
 body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%);
+    background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, transparent 65%);
     z-index: -1;
     pointer-events: none;
 }
