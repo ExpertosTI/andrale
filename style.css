@@ -89,7 +89,8 @@ body.locked { overflow: hidden; height: 100vh; }
     filter: sepia(0.55) saturate(1.8) hue-rotate(-15deg) contrast(1.15) brightness(1.05);
 }
 #bg-video {
-    filter: sepia(0.5) hue-rotate(-5deg) saturate(0.6) brightness(1.6) contrast(0.9);
+    /* Adjusted to avoid 'burnt/white' highlights, giving it a deeper cream/champagne depth */
+    filter: sepia(0.4) hue-rotate(-5deg) saturate(0.8) brightness(1.18) contrast(1.1);
 }
 .bg-video.is-visible { opacity: 1; }
 .intro-scrub { 
