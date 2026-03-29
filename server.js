@@ -3,8 +3,24 @@ const path = require('path');
 const Database = require('better-sqlite3');
 
 const app = express();
-const PORT = 3000;
-const ADMIN_KEY = 'bodam2027';
+const PORT = process.env.WEDDING_PORT || 3001;
+const ADMIN_KEY = process.env.WEDDING_ADMIN_KEY || (() => { console.warn('[WARN] WEDDING_ADMIN_KEY not set in environment!'); return 'CHANGE_ME_NOW'; })();
+
+// Rate limiting for admin endpoints
+let adminAttempts = new Map();
+function adminRateLimit(req, res, next) {
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+  const window = 15 * 60 * 1000; // 15 minutes
+  const maxAttempts = 5;
+  const attempts = (adminAttempts.get(ip) || []).filter(t => t > now - window);
+  if (attempts.length >= maxAttempts) {
+    return res.status(429).json({ error: 'Demasiados intentos. Espere 15 minutos.' });
+  }
+  attempts.push(now);
+  adminAttempts.set(ip, attempts);
+  next();
+}
 
 // Ensure data directory exists
 const fs = require('fs');
@@ -36,9 +52,21 @@ db.exec(`
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname), {
+
+// Only serve public-safe static files (not server.js, package.json, data/, etc.)
+const publicDir = path.join(__dirname);
+app.use(express.static(publicDir, {
     extensions: ['html'],
-    index: 'index.html'
+    index: 'index.html',
+    dotfiles: 'deny',
+    setHeaders: (res, filePath) => {
+      // Block access to sensitive files
+      const blocked = /\.(js|json|db|sqlite)$/i;
+      const basename = path.basename(filePath);
+      if (basename === 'server.js' || basename === 'package.json' || basename === 'package-lock.json') {
+        res.status(403).end();
+      }
+    }
 }));
 
 // Track page view on first load
@@ -88,8 +116,8 @@ app.post('/api/track', (req, res) => {
     }
 });
 
-// Stats API (protected)
-app.get('/api/stats', (req, res) => {
+// Stats API (protected with rate limiting)
+app.get('/api/stats', adminRateLimit, (req, res) => {
     if (req.query.key !== ADMIN_KEY) {
         return res.status(403).json({ error: 'Acceso denegado' });
     }
