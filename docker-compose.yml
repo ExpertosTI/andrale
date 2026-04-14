@@ -2,9 +2,9 @@ version: '3.8'
 
 services:
   wedding:
-    image: miki-wedding:latest
+    image: andreina-alejandro-wedding:latest
     build: .
-    container_name: michelle-mike-wedding
+    container_name: andreina-alejandro-wedding
     restart: always
     environment:
       - TZ=America/Santo_Domingo
@@ -18,10 +18,10 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.wedding-http.rule=Host(`michellemike.renace.tech`)"
+        - "traefik.http.routers.wedding-http.rule=Host(`andreina-alejandro.renace.tech`)"
         - "traefik.http.routers.wedding-http.entrypoints=web"
         - "traefik.http.routers.wedding-http.middlewares=wedding-redirect-https"
-        - "traefik.http.routers.wedding-https.rule=Host(`michellemike.renace.tech`)"
+        - "traefik.http.routers.wedding-https.rule=Host(`andreina-alejandro.renace.tech`)"
         - "traefik.http.routers.wedding-https.entrypoints=websecure"
         - "traefik.http.routers.wedding-https.tls=true"
         - "traefik.http.routers.wedding-https.tls.certresolver=letsencryptresolver"

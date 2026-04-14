@@ -3,36 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Boda de Michelle y Mike - 21 Junio 2026</title>
+    <title>Boda de Andreína & Alejandro - 16 Mayo 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&family=Alex+Brush&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Alex+Brush&family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.525.0"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="is-scrolling">
+    <!-- Preloader -->
+    <div id="preloader" class="loading">
+        <img src="/images/logo.svg" alt="Loading" class="loading-logo">
+        <div class="loading-progress">
+            <div id="loading-bar" class="loading-progress-bar" style="width: 0%"></div>
+            <p id="loading-text" class="loading-progress-text">Preparando experiencia...</p>
+        </div>
+    </div>
+
+    <div class="fluid-effect" aria-hidden="true">
+        <div class="fluid"></div>
+        <div class="fluid"></div>
+        <div class="fluid"></div>
+    </div>
 
     <!-- Scroll Hint Overlay -->
     <div id="initial-scroll-prompt" class="entrance-overlay" style="background: transparent; z-index: 10; justify-content: flex-end; padding-bottom: 50px;">
         <div class="entrance-info">
             <div class="entrance-hint pulse-anim" style="opacity: 0.9;">
-                <i data-lucide="chevrons-up" style="width: 44px; height: 44px; color: var(--accent-gold); margin-bottom: 15px;"></i>
-                <p style="letter-spacing: 4px; font-size: 0.8rem; font-family: 'Syncopate', sans-serif;">DESLIZA HACIA ARRIBA</p>
+                <i data-lucide="chevrons-up" style="width: 44px; height: 44px; color: var(--accent-teal); margin-bottom: 15px;"></i>
+                <p style="letter-spacing: 4px; font-size: 0.8rem; font-family: var(--font-display);">DESLIZA HACIA ARRIBA</p>
             </div>
         </div>
     </div>
 
     <!-- Intro Video (scroll-scrubbed portal) -->
-    <video id="intro-scrub-video" autoplay muted playsinline class="bg-video intro-scrub" preload="auto">
-        <source src="assets/intro.mov" type="video/quicktime">
-        <source src="assets/intro.mov" type="video/mp4">
-    </video>
+    <video id="intro-scrub-video" muted playsinline class="bg-video intro-scrub" preload="auto"></video>
 
     <!-- Background Video (scroll-scrubbed atmosphere) -->
-    <video id="bg-video" autoplay muted playsinline class="bg-video" preload="auto">
-        <source src="assets/bg.mov" type="video/quicktime">
-        <source src="assets/bg.mov" type="video/mp4">
-    </video>
+    <video id="bg-video" muted playsinline class="bg-video" preload="auto"></video>
 
     <!-- Gold Dust Canvas -->
     <canvas id="canvas"></canvas>

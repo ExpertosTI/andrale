@@ -1,18 +1,18 @@
 #!/bin/bash
 # ==============================================================================
-# MIKI - Automated Wedding Invitation Deployment
+# Wedding Invitation Deployment (Andreína & Alejandro)
 # ==============================================================================
 # Protocol: RENACE.TECH (Local Build + Swarm Stack)
 
 set -e
 
-REPO_URL="https://github.com/ExpertosTI/miki.git"
-PROJECT_DIR="/var/www/miki"
-STACK_NAME="miki-wedding"
-SERVICE_NAME="miki-wedding_wedding"
+REPO_URL="https://github.com/ExpertosTI/andreina-alejandro.git"
+PROJECT_DIR="/var/www/andreinalejandro"
+STACK_NAME="andreina-alejandro-wedding"
+SERVICE_NAME="andreina-alejandro-wedding_wedding"
 
 echo "========================================================"
-echo "🚀 Starting MIKI Deployment (Wedding)..."
+echo "🚀 Starting Deployment (Andreína & Alejandro Wedding)..."
 echo "========================================================"
 
 # 1. Sync Code
@@ -47,5 +47,5 @@ docker image prune -f
 
 echo "========================================================"
 echo "✅ Deployment successful!"
-echo "📡 URL: https://michellemike.renace.tech"
+echo "📡 URL: https://andreina-alejandro.renace.tech"
 echo "========================================================"

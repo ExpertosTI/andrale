@@ -3,7 +3,7 @@ const path = require('path');
 const Database = require('better-sqlite3');
 
 const app = express();
-const PORT = process.env.WEDDING_PORT || 3001;
+const PORT = process.env.WEDDING_PORT || 3000;
 const ADMIN_KEY = process.env.WEDDING_ADMIN_KEY || (() => { console.warn('[WARN] WEDDING_ADMIN_KEY not set in environment!'); return 'CHANGE_ME_NOW'; })();
 
 // Rate limiting for admin endpoints

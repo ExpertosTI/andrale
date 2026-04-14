@@ -31,20 +31,76 @@ const logger = (msg) => {
     console.log(`[INVITATION-LOG] [${timestamp}] ${msg}`);
 };
 
-// Pre-load monitoring
+// PRELOADER SYSTEM
+const preloader = document.getElementById('preloader');
+const loadingBar = document.getElementById('loading-bar');
+const loadingText = document.getElementById('loading-text');
+
+let loadedAssets = 0;
+const totalAssets = 2; // intro + bg videos
+
+const updateLoadingProgress = () => {
+    loadedAssets++;
+    const progress = (loadedAssets / totalAssets) * 100;
+    if (loadingBar) loadingBar.style.width = `${progress}%`;
+    if (loadingText) loadingText.innerText = `Cargando activos... ${Math.round(progress)}%`;
+    
+    if (loadedAssets >= totalAssets) {
+        setTimeout(() => {
+            if (preloader) preloader.classList.add('hidden');
+            experienceStarted = true;
+            logger('Experience Started (All assets loaded)');
+        }, 800);
+    }
+};
+
+// LAYERED RENDERING: Fetch as Blob to guarantee 200 OK (no 206 partial content loops)
+const loadOptimizedVideo = (videoEl, tinySrc, hqSrc) => {
+    if (!videoEl) {
+        updateLoadingProgress(); // Count as loaded if element doesn't exist
+        return;
+    }
+    
+    // Initial fetch for tiny video
+    fetch(tinySrc)
+        .then(response => response.blob())
+        .then(blob => {
+            const tinyUrl = URL.createObjectURL(blob);
+            videoEl.src = tinyUrl;
+            
+            // For scrubbing videos, we want HQ as soon as possible
+            fetch(hqSrc)
+                .then(r => r.blob())
+                .then(hqBlob => {
+                    const hqUrl = URL.createObjectURL(hqBlob);
+                    const currentTime = videoEl.currentTime;
+                    videoEl.src = hqUrl;
+                    videoEl.currentTime = currentTime;
+                    updateLoadingProgress();
+                    logger(`HQ video loaded: ${hqSrc}`);
+                })
+                .catch(e => {
+                    updateLoadingProgress(); // Still proceed
+                    logger(`Failed to load HQ: ${hqSrc}`);
+                });
+        })
+        .catch(e => {
+            updateLoadingProgress(); // Still proceed
+            logger(`Failed to load tiny: ${tinySrc}`);
+        });
+};
+
 if (introVideoScrub) {
-    introVideoScrub.addEventListener('loadstart', () => logger('Intro Video: Load Started'));
-    introVideoScrub.addEventListener('loadedmetadata', () => logger(`Intro Video: Metadata Loaded (Duration: ${introVideoScrub.duration}s)`));
-    introVideoScrub.addEventListener('canplaythrough', () => logger('Intro Video: Can Play Through (Ready)'));
+    loadOptimizedVideo(introVideoScrub, 'assets/intro-scrub-tiny.mp4', 'assets/intro-scrub-hq.mp4');
+} else {
+    updateLoadingProgress();
 }
 
 if (bgVideo) {
-    bgVideo.addEventListener('loadstart', () => logger('BG Video: Load Started'));
-    bgVideo.addEventListener('loadedmetadata', () => logger(`BG Video: Metadata Loaded (Duration: ${bgVideo.duration}s)`));
-    bgVideo.addEventListener('canplaythrough', () => logger('BG Video: Can Play Through (Ready)'));
+    loadOptimizedVideo(bgVideo, 'assets/bg-tiny.mp4', 'assets/bg-hq.mp4');
+} else {
+    updateLoadingProgress();
 }
-
-window.addEventListener('load', () => logger('Window fully loaded (All assets ready)'));
 
 const resizeCanvas = () => {
     if (!canvas) return;
@@ -76,7 +132,11 @@ class Particle {
         this.vy = (Math.random() - 0.5) * 0.15;
         
         this.shimmerPhase = Math.random() * Math.PI * 2;
-        this.color = Math.random() > 0.5 ? '#fcf6ba' : '#d4af37';
+        // Use a mix of gold and teal particles
+        const rand = Math.random();
+        if (rand > 0.7) this.color = '#2dd4bf'; // Teal
+        else if (rand > 0.4) this.color = '#fcf6ba'; // Light gold
+        else this.color = '#d4af37'; // Deep gold
     }
 
     update() {
@@ -129,8 +189,7 @@ class Particle {
 
 const initParticles = () => {
     particles = [];
-    // Dense dust, extremely high count for active life
-    const count = window.innerWidth < 600 ? 550 : particleCount;
+    const count = window.innerWidth < 600 ? 550 : baseParticleCount;
     for (let i = 0; i < count; i += 1) {
         particles.push(new Particle());
     }
@@ -139,8 +198,8 @@ const initParticles = () => {
 const animate = () => {
     if (!ctx || !canvas) return;
     
-    // Smooth Scroll fluid interpolation
-    currentScroll += (targetScroll - currentScroll) * 0.08;
+    // Snappier fluid interpolation (0.1 instead of 0.08)
+    currentScroll += (targetScroll - currentScroll) * 0.1;
     
     // Draw Particles
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -155,85 +214,81 @@ const animate = () => {
             progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
         }
 
-        const introZone = vh * 1.4; // Slightly longer scroll for intro
+        const introZone = vh * 1.5; // Adjusted intro zone for better pacing
         
+        // VIDEO SCRUBBING OPTIMIZATION
+        const updateVideoScrub = (video, ratio) => {
+            if (!video || isNaN(video.duration)) return;
+            const targetTime = ratio * (video.duration - 0.05);
+            
+            // Only update if difference > 0.033s (approx 1 frame at 30fps) to reduce GPU load
+            if (Math.abs(video.currentTime - targetTime) > 0.033) {
+                video.currentTime = targetTime;
+            }
+
+            // PARALLAX SCALE EFFECT (Pescaderia Style)
+            // As we scroll, the video scales slightly to give depth
+            const scale = 1 + (ratio * 0.05); 
+            video.style.transform = `translate(-50%, -50%) translateZ(0) scale(${scale})`;
+        };
+
         if (currentScroll < introZone) {
-            if (introVideoScrub && !isNaN(introVideoScrub.duration)) {
-                // Ensure bgVideo is hidden during intro seal
+            if (introVideoScrub) {
                 if (bgVideo && bgVideo.classList.contains('is-visible')) bgVideo.classList.remove('is-visible');
 
                 const ratio = Math.max(0, currentScroll / introZone);
-                introVideoScrub.currentTime = ratio * (introVideoScrub.duration - 0.05);
+                updateVideoScrub(introVideoScrub, ratio);
                 introVideoScrub.classList.add('is-visible');
 
-                // Fixed Hero Overlay Logic: Appears between 60% and 105% of the introZone scroll
+                // Hero Overlay Logic
                 const hero = document.getElementById('hero-overlay');
                 if (hero) {
-                    if (ratio > 0.6 && ratio < 1.05) {
-                        hero.classList.add('is-visible');
-                        hero.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.add('is-visible'));
-                        hero.querySelectorAll('.fade-in-text').forEach(t => t.classList.add('is-visible'));
-                    } else {
-                        hero.classList.remove('is-visible');
-                        hero.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.remove('is-visible'));
-                        hero.querySelectorAll('.fade-in-text').forEach(t => t.classList.remove('is-visible'));
-                    }
+                    const heroOpacity = Math.max(0, Math.min(1, (ratio - 0.5) * 4)); // Fades in between 0.5 and 0.75 ratio
+                    hero.style.opacity = heroOpacity;
+                    hero.classList.toggle('is-visible', heroOpacity > 0);
                 }
             }
         } else {
-            // Beyond introZone, scrub the second BG video
-            if (bgVideo && !isNaN(bgVideo.duration)) {
+            if (bgVideo) {
                 const bgScrollRange = scrollMax - introZone;
                 const currentBgScroll = currentScroll - introZone;
                 const bgRatio = Math.max(0, currentBgScroll / bgScrollRange);
-                bgVideo.currentTime = bgRatio * (bgVideo.duration - 0.05);
+                updateVideoScrub(bgVideo, bgRatio);
                 bgVideo.classList.add('is-visible');
             }
             if (introVideoScrub) introVideoScrub.classList.remove('is-visible');
             
-            // Ensure Hero is hidden
             const hero = document.getElementById('hero-overlay');
-            if (hero) {
-                hero.classList.remove('is-visible');
-                hero.querySelectorAll('.is-visible').forEach(t => t.classList.remove('is-visible'));
-            }
+            if (hero) hero.style.opacity = 0;
         }
 
-        // Hide scroll prompt once user starts scrolling
-        const scrollPrompt = document.getElementById('initial-scroll-prompt');
-        if (scrollPrompt) {
-            if (currentScroll > 50) scrollPrompt.classList.add('is-hidden');
-            else scrollPrompt.classList.remove('is-hidden');
-        }
-
-        // Section Reveal logic (details, rules, gifts)
+        // Section Reveal logic (Pescaderia Style: rising from depth)
         sections.forEach((section) => {
             const rect = section.getBoundingClientRect();
-            const center = rect.top + rect.height / 2;
-            const dist = (center - vh / 2) / (vh * 0.75);
-            const absDist = Math.abs(dist);
+            const viewCenter = vh / 2;
+            const sectionCenter = rect.top + rect.height / 2;
+            const distFromCenter = (sectionCenter - viewCenter) / vh;
             
-            if (absDist < 1.3) {
-                const opacity = Math.max(0, 1 - Math.pow(absDist, 1.8));
-                const scale = 0.94 + (0.06 * opacity);
-                section.style.opacity = opacity;
-                section.style.transform = `scale(${scale}) translateY(${dist * 40}px)`;
-                section.style.pointerEvents = opacity > 0.4 ? 'auto' : 'none';
+            // Activate section when it's near the viewport
+            if (rect.top < vh * 0.8 && rect.bottom > vh * 0.2) {
+                section.classList.add('active');
                 
-                // Haptic bump when section centers
-                if (opacity > 0.85 && section.dataset.bumped !== "true") {
-                    if (navigator.vibrate) navigator.vibrate(10);
-                    section.dataset.bumped = "true";
-                } else if (opacity < 0.5) {
-                    section.dataset.bumped = "false";
-                }
+                // Parallax/Depth effect based on distance from center
+                const intensity = Math.min(1, Math.max(0, 1 - Math.abs(distFromCenter) * 1.2));
+                const translateY = distFromCenter * 50;
+                const scale = 0.95 + (0.05 * intensity);
+                
+                section.style.transform = `translateY(${translateY}px) scale(${scale})`;
+                section.style.opacity = intensity;
 
-                // Reveal immersive and standard fade-in texts inside section
-                section.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.toggle('is-visible', opacity > 0.5));
-                section.querySelectorAll('.fade-in-text').forEach(t => t.classList.toggle('is-visible', opacity > 0.6));
+                // Toggle visibility for children based on intensity
+                const showChildren = intensity > 0.4;
+                section.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.toggle('is-visible', showChildren));
+                section.querySelectorAll('.fade-in-text').forEach(t => t.classList.toggle('is-visible', showChildren));
             } else {
-                section.style.opacity = '0';
-                section.querySelectorAll('.fade-in-text').forEach(t => t.classList.remove('is-visible'));
+                section.classList.remove('active');
+                section.style.opacity = 0;
+                section.querySelectorAll('.is-visible').forEach(t => t.classList.remove('is-visible'));
             }
         });
     }
@@ -264,7 +319,7 @@ const prepareImmersiveText = () => {
 };
 
 // Countdown Logic
-const targetDate = new Date('2026-06-21T20:00:00').getTime();
+const targetDate = new Date('2026-05-16T16:00:00').getTime();
 const updateCountdown = () => {
     const now = new Date().getTime();
     const distance = targetDate - now;
