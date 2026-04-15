@@ -1,0 +1,94 @@
+{
+  "wedding": {
+    "title": "Boda Civil - Andreína & Alejandro",
+    "date": "2026-05-16",
+    "dateFormatted": "Sábado, 16 de mayo 2026",
+    "hero": {
+      "names": "Andreína & Alejandro",
+      "verse": "Mejores son dos que uno... Porque si cayeren, el uno levantará a su compañero.",
+      "verseBook": "Eclesiastés 4:9-10",
+      "backgroundImage": "assets/hero.jpg",
+      "backgroundVideo": "assets/background-video.mov"
+    },
+    "ceremony": {
+      "title": "Boda Civil",
+      "venue": "Plaza Roja",
+      "level": "Segundo Nivel",
+      "time": "4:00 PM",
+      "address": "Autopista de San Isidro, Plaza Roja Segundo Nivel, Santo Domingo Este",
+      "coordinates": {
+        "lat": 18.496412,
+        "lng": -69.797211
+      },
+      "maps": {
+        "google": "https://www.google.com/maps/search/?api=1&query=18.496412,-69.797211",
+        "waze": "https://ul.waze.com/ul?ll=18.496412,-69.797211&navigate=yes",
+        "apple": "maps://?q=18.496412,-69.797211"
+      }
+    },
+    "dressCode": {
+      "title": "Código de Vestimenta",
+      "style": "Formal"
+    },
+    "gifts": {
+      "title": "Regalos",
+      "message": "Su presencia es lo más importante para nosotros. Si desea hacernos algún obsequio puede que de esta forma sea más cómodo.",
+      "accounts": [
+        {
+          "bank": "Popular",
+          "accountNumber": "815442256",
+          "accountType": "Ahorros",
+          "holder": "Andreína Cuevas"
+        },
+        {
+          "bank": "Banreservas",
+          "accountNumber": "9608198982",
+          "accountType": "Ahorros",
+          "holder": "Alejandro Paula"
+        }
+      ],
+      "closingMessage": "Esperamos que puedan celebrar con nosotros nuestra unión, el amor incondicional y el compromiso."
+    },
+    "contacts": [
+      {
+        "name": "Andreína Cuevas",
+        "phone": "849-815-4422",
+        "role": "Novia"
+      },
+      {
+        "name": "Alejandro Paula",
+        "phone": "849-960-8198",
+        "role": "Novio"
+      }
+    ],
+    "rsvp": {
+      "enabled": true,
+      "endpoint": "/api/rsvp",
+      "deadline": "2026-05-01",
+      "whatsappNotification": {
+        "enabled": true,
+        "adminPhone": "8498154422",
+        "messageTemplate": "¡Nueva confirmación de boda! *{name}* ha confirmado asistencia. Cantidad: {guests}. Deseos: {wishes}"
+      }
+    },
+    "design": {
+      "fonts": {
+        "display": "Rouge Script",
+        "body": "Afta Sans",
+        "accent": "Syncopate"
+      },
+      "colors": {
+        "primary": "#8B7355",
+        "secondary": "#A09080",
+        "accent": "#D4AF37",
+        "background": "#F5F0EB",
+        "text": "#4A4A4A"
+      }
+    }
+  },
+  "meta": {
+    "version": "2.0",
+    "created": "2026-04-13",
+    "updated": "2026-04-13"
+  }
+}

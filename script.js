@@ -39,7 +39,10 @@ petalImages[1].src = 'assets/Recurso 2.png';
 petalImages[2].src = 'assets/Recurso 1.png';
 
 class Particle {
-    constructor() { this.reset(true); }
+    constructor(isBurst = false) { 
+        this.isBurst = isBurst;
+        this.reset(true); 
+    }
 
     reset(initial = false) {
         this.x = Math.random() * (canvas ? canvas.width : 400);
@@ -51,6 +54,10 @@ class Particle {
         if (Math.random() > 0.85) this.size *= 1.4;
         this.depth = Math.random() * 0.7 + 0.3;
         this.opacity = Math.random() * 0.5 + 0.15;
+        if (this.isBurst) {
+            this.opacity = Math.random() * 0.4 + 0.6; // Brighter burst particles
+            // Spawn them slightly below to float up or above
+        }
         this.offsetY = Math.random() * 50 - 25;
         this.vx = (Math.random() - 0.5) * 1.2;
         this.vy = Math.random() * 1.2 + 0.4;
@@ -66,6 +73,12 @@ class Particle {
         this.y -= scrollDelta * 0.012 * this.depth;
         this.y += (0.5 * this.depth + this.vy);
         this.angle += this.spin * (1 + scrollVelocity * 0.05);
+
+        if (this.isBurst) {
+            this.opacity -= 0.015; // Smooth fade out
+            if (this.opacity <= 0) this.dead = true;
+        }
+
         if (this.y > canvas.height + 80) this.y = -80;
         if (this.y < -80) this.y = canvas.height + 80;
         if (this.x < -80) this.x = canvas.width + 80;
@@ -138,7 +151,27 @@ updateCountdown();
 
 // ─── MAIN ANIMATE LOOP ───────────────────────────────────────────────────
 const animate = () => {
-    currentScroll += (targetScroll - currentScroll) * 0.1;
+    let scrollDeltaValue = targetScroll - currentScroll;
+    currentScroll += scrollDeltaValue * 0.1;
+
+    // Burst particles on fast scroll
+    let velocity = Math.abs(scrollDeltaValue);
+    if (velocity > 15 && particles.length < 350 && Math.random() > 0.4) {
+        let p = new Particle(true); // isBurst = true
+        p.y = scrollDeltaValue > 0 ? (canvas ? canvas.height + 20 : 800) : -20;
+        particles.push(p);
+    }
+    // Clean dead particles
+    particles = particles.filter(p => !p.dead);
+
+    // Define virtual height for fixed sections scrolljacking bounds
+    if (!window.scrollAreaSetup) {
+        const main = document.getElementById('main-content');
+        if (main) {
+            main.style.height = `${100 + (sections.length * 130)}vh`;
+        }
+        window.scrollAreaSetup = true;
+    }
 
     // Draw particles
     if (ctx && canvas) {
@@ -171,21 +204,15 @@ const animate = () => {
         scrollHint.style.opacity = currentScroll > 40 ? '0' : '1';
     }
 
-    // ── HERO LOGO: fades to ZERO by 40% of vh scroll
-    const whiteLogoOpacity = Math.max(0, 1 - (currentScroll / (vh * 0.20)));
-    const colorLogoOpacity = Math.max(0, 1 - (currentScroll / (vh * 0.45)));
-    const logoScale   = 0.88 + colorLogoOpacity * 0.12; // 0.88 → 1.0
+    // ── HERO LOGO: fades to ZERO by 45% of vh scroll
+    const whiteLogoOpacity = Math.max(0, 1 - (currentScroll / (vh * 0.45)));
+    const logoScale   = 0.88 + whiteLogoOpacity * 0.12; // 0.88 → 1.0
     
     if (heroLogoImg) {
         heroLogoImg.style.opacity   = whiteLogoOpacity;
         heroLogoImg.style.transform = `scale(${logoScale})`;
     }
-    const heroLogoColor = document.getElementById('hero-logo-color');
-    if (heroLogoColor) {
-        heroLogoColor.style.opacity   = colorLogoOpacity;
-        heroLogoColor.style.transform = `scale(${logoScale})`;
-    }
-
+    
     // ── HERO VERSE: bell curve, fully gone by 95% of vh scroll
     //   starts at 10% → peaks at 50% → ends at 95%
     const vS = vh * 0.10, vE = vh * 0.95;
@@ -200,7 +227,7 @@ const animate = () => {
     const book  = document.getElementById('data-hero-verse-book');
     const date  = document.getElementById('data-hero-date');
 
-    const heroVisible = colorLogoOpacity > 0 || verseOpacity > 0.01;
+    const heroVisible = whiteLogoOpacity > 0 || verseOpacity > 0.01;
     if (heroOverlay) heroOverlay.classList.toggle('is-visible', heroVisible);
 
     if (sep)   sep.style.opacity   = verseOpacity;
@@ -224,17 +251,12 @@ const animate = () => {
     const heroAllGone = currentScroll > vh * 0.92;
 
     sections.forEach((sec, index) => {
-        const rect   = sec.getBoundingClientRect();
-        const isFirstSection = index === 0;
+        // Hero verse finishes completely around 0.95vh. Leave a gap.
+        const heroClearBuffer = vh * 1.1; 
+        const start = heroClearBuffer + (index * vh * 1.3);
+        const end = start + vh * 1.15; // Active window length
 
-        // First section: only activate after hero is completely gone
-        // Subsequent sections: activate when entering viewport (center threshold)
-        let shouldActivate;
-        if (isFirstSection) {
-            shouldActivate = heroAllGone && rect.top < vh * 0.75 && rect.bottom > vh * 0.15;
-        } else {
-            shouldActivate = rect.top < vh * 0.65 && rect.bottom > vh * 0.15;
-        }
+        let shouldActivate = currentScroll > start && currentScroll < end;
 
         if (shouldActivate) {
             if (!sec.classList.contains('active')) {
