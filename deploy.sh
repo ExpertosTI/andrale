@@ -14,7 +14,7 @@ if [ -d "$REPO_DIR" ]; then
     git reset --hard origin/$BRANCH
 else
     # First time clone (User must have SSH keys setup)
-    git clone -b $BRANCH https://github.com/ExpertosTI/www.renace.tech.git $REPO_DIR
+    git clone -b $BRANCH https://github.com/ExpertosTI/andrale.git $REPO_DIR
     cd $REPO_DIR
 fi
 
