@@ -3,119 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SeCasan | Invitaciones Premium con IA</title>
+    <title>SeCasan | Gestión de Invitaciones Premium</title>
     <link rel="stylesheet" href="/assets/premium-theme.css">
-    <script src="https://unpkg.com/lucide@0.525.0"></script>
     <style>
-        .hero {
-            position: relative;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            text-align: center;
+        body { 
+            display: flex; align-items: center; justify-content: center; height: 100vh; 
+            background: #000; overflow: hidden; 
         }
-        .hero-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('/assets/secasan_premium_hero_bg_1776271735204.png') center/cover no-repeat;
-            z-index: -1;
-            filter: brightness(0.6);
-            transform: scale(1.1);
-            animation: slowZoom 20s infinite alternate;
+        .hero { text-align: center; max-width: 600px; padding: 40px; }
+        .hero h1 { font-size: 3rem; margin-bottom: 16px; font-weight: 400; letter-spacing: -1px; }
+        .hero p { color: var(--gray); font-size: 1.1rem; margin-bottom: 40px; }
+        
+        .logo-mark { 
+            width: 48px; height: 48px; background: var(--gold); border-radius: 12px; 
+            margin: 0 auto 32px; 
         }
-        @keyframes slowZoom {
-            to { transform: scale(1); }
-        }
-        .hero-content {
-            max-width: 800px;
-            padding: 60px;
-            z-index: 1;
-        }
-        .hero h1 {
-            font-size: 6rem;
-            margin: 0;
-            line-height: 1;
-            font-weight: 300;
-            background: linear-gradient(to bottom, #fff, #D4AF37);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -2px;
-        }
-        .features {
-            padding: 120px 20px;
-            background: #080A0E;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-        .feature-card {
-            padding: 50px;
-            transition: 0.4s;
-            cursor: default;
-        }
-        .feature-card:hover {
-            border-color: var(--gold);
-            transform: translateY(-10px);
-        }
-        .feature-card i { color: var(--gold); margin-bottom: 30px; }
-        .feature-card h3 { font-size: 1.8rem; margin-bottom: 15px; }
-        .feature-card p { opacity: 0.7; font-size: 1rem; }
     </style>
 </head>
 <body>
-    <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-content glass reveal">
-            <div class="text-luxury" style="margin-bottom: 25px;">Próxima Generación</div>
-            <h1>SeCasan</h1>
-            <p class="italic-accent" style="font-size: 1.6rem; margin: 30px 0 50px; opacity: 0.9;">
-                Invitaciones digitales que narran tu <span style="font-weight:600">historia de amor</span> con la magia de la IA.
-            </p>
-            <div class="cta-group">
-                <a href="/dashboard" class="btn-gold">COMENZAR EXPERIENCIA ✨</a>
-            </div>
+    <div class="hero">
+        <div class="logo-mark"></div>
+        <h1>SeCasan.</h1>
+        <p>Crea invitaciones digitales de alta gama con asistencia inteligente.</p>
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="/dashboard" class="btn btn-primary">Entrar al panel</a>
+            <a href="https://renace.tech" target="_blank" class="btn">Conocer Renace</a>
         </div>
-    </section>
-
-    <section class="features">
-        <div class="feature-card glass reveal">
-            <i data-lucide="sparkles" size="40"></i>
-            <h3>Curación con IA</h3>
-            <p>Gemini 2.0 redacta, diseña y personaliza cada detalle para que tu invitación sea única en el mundo.</p>
-        </div>
-        <div class="feature-card glass reveal">
-            <i data-lucide="camera" size="40"></i>
-            <h3>Cine Digital</h3>
-            <p>Fondos animados y transiciones fluidas que convierten una simple invitación en una película privada.</p>
-        </div>
-        <div class="feature-card glass reveal">
-            <i data-lucide="gem" size="40"></i>
-            <h3>Calidad Diamante</h3>
-            <p>Diseño responsivo optimizado para una legibilidad perfecta en cualquier dispositivo móvil.</p>
-        </div>
-    </section>
-
-    <footer style="padding: 60px; text-align: center; opacity: 0.4; font-size: 0.8rem;">
-        &copy; 2026 SeCasan by RenaceTech. El lujo está en el detalle.
-    </footer>
-
-    <script>
-        lucide.createIcons();
-        
-        // Simple Intersection Observer for reveal animation
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    </script>
+    </div>
 </body>
 </html>

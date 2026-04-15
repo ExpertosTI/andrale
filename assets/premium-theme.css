@@ -1,12 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');
 
 :root {
+    --bg: #000000;
+    --accents-1: #111111;
+    --accents-2: #333333;
+    --accents-3: #444444;
+    --gray: #888888;
+    --fg: #ffffff;
     --gold: #D4AF37;
-    --gold-glow: rgba(212, 175, 55, 0.4);
-    --dark-bg: #0D0F14;
-    --card-bg: rgba(25, 30, 45, 0.6);
-    --text-silk: #F8F5F2;
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --gold-dim: rgba(212, 175, 55, 0.1);
+    --radius: 8px;
 }
 
 * { box-sizing: border-box; }
@@ -14,66 +17,110 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: var(--dark-bg);
-    color: var(--text-silk);
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    line-height: 1.6;
-    overflow-x: hidden;
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
+    margin: 0;
+    font-weight: 500;
+    color: var(--fg);
+}
+
+.luxury-text {
     font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    letter-spacing: 2px;
-}
-
-/* Glassmorphism utility */
-.glass {
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-}
-
-/* Premium Button */
-.btn-gold {
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, #D4AF37 0%, #B69121 100%);
-    color: #000;
-    padding: 18px 40px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    display: inline-block;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 20px var(--gold-glow);
-    border: none;
-    cursor: pointer;
-}
-
-.btn-gold:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 30px var(--gold-glow);
-    filter: brightness(1.1);
-}
-
-/* Typography styles */
-.text-luxury {
-    font-family: 'Montserrat', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 6px;
-    font-size: 0.75rem;
-    color: var(--gold);
-    font-weight: 400;
-}
-
-.italic-accent {
     font-style: italic;
-    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+}
+
+/* Tool UI Elements */
+.sidebar {
+    background: var(--bg);
+    border-right: 1px solid var(--accents-2);
+}
+
+.card {
+    background: var(--accents-1);
+    border: 1px solid var(--accents-2);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color 0.2s;
+}
+
+.card:hover {
+    border-color: var(--accents-3);
+}
+
+/* Inputs */
+.input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--accents-2);
+    border-radius: var(--radius);
+    color: var(--fg);
+    padding: 12px 16px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    border-color: var(--gray);
+}
+
+/* Professional Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--accents-2);
+    background: var(--fg);
+    color: var(--bg);
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: var(--bg);
+    color: var(--fg);
+    border-color: var(--accents-3);
+}
+
+.btn-primary {
+    background: var(--gold);
+    color: #000;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #bfa030;
+    transform: none;
+}
+
+/* Utilities */
+.label {
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--gray);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    background: var(--accents-2);
+    color: var(--gray);
 }
