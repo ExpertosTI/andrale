@@ -18,7 +18,9 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.wedding-http.service=wedding-svc"
+        - "traefik.http.routers.wedding-http.rule=Host(`anle.renace.tech`)"
+        - "traefik.http.routers.wedding-http.entrypoints=web"
+        - "traefik.http.routers.wedding-http.middlewares=wedding-redirect-https"
         - "traefik.http.routers.wedding-https.rule=Host(`anle.renace.tech`)"
         - "traefik.http.routers.wedding-https.entrypoints=websecure"
         - "traefik.http.routers.wedding-https.tls=true"
