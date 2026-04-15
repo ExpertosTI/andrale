@@ -16,11 +16,76 @@ let targetScroll = 0;
 let currentScroll = 0;
 let experienceStarted = true; // immediate
 
-// ─── PRELOADER ────────────────────────────────────────────────────────────
+// ─── PRELOADER & VIDEO BLOB ──────────────────────────────────────────────────
 const preloader = document.getElementById('preloader');
+const loaderProgress = document.getElementById('loader-progress');
+const loaderText = document.getElementById('loader-text');
+
+/**
+ * Advanced Asset Loading: Fetching video as Blob to prevent
+ * range-request blocking and cancellations in high-scrub environments.
+ */
+async function loadVideoAsBlob() {
+    const videoUrl = 'assets/rosas-fondo.mp4';
+    try {
+        const response = await fetch(videoUrl);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const reader = response.body.getReader();
+        const contentLength = +response.headers.get('Content-Length');
+        
+        let receivedLength = 0;
+        let chunks = [];
+        
+        while(true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            receivedLength += value.length;
+            
+            // Update UI
+            if (contentLength && loaderProgress) {
+                const percent = Math.round((receivedLength / contentLength) * 100);
+                loaderProgress.style.width = `${percent}%`;
+                if (loaderText) loaderText.innerText = `RECOLECTANDO PÉTALOS... ${percent}%`;
+            }
+        }
+
+        const blob = new Blob(chunks);
+        const objectUrl = URL.createObjectURL(blob);
+        
+        if (motionScrubVideo) {
+            motionScrubVideo.src = objectUrl;
+            // Wait for metadata/first frame
+            motionScrubVideo.addEventListener('loadeddata', () => {
+                if (loaderText) loaderText.innerText = "¡TODO LISTO!";
+                setTimeout(revealInvitation, 800);
+            }, { once: true });
+        }
+    } catch (error) {
+        console.error('Video load failed:', error);
+        // Fallback for direct loading if fetch fails
+        if (motionScrubVideo) {
+            motionScrubVideo.src = videoUrl;
+            setTimeout(revealInvitation, 1000);
+        }
+    }
+}
+
+function revealInvitation() {
+    if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+            preloader.style.display = 'none';
+            // Start micro-animations
+            document.body.classList.remove('loading');
+        }, 800);
+    }
+}
+
+// Start loading process
 if (preloader) {
-    if (motionScrubVideo) motionScrubVideo.load();
-    setTimeout(() => preloader.classList.add('hidden'), 600);
+    loadVideoAsBlob();
 }
 
 // ─── CANVAS RESIZE ────────────────────────────────────────────────────────
@@ -188,14 +253,16 @@ const animate = () => {
     }
 
     // ── Video scrub
-    if (motionScrubVideo && !isNaN(motionScrubVideo.duration)) {
+    if (motionScrubVideo && motionScrubVideo.readyState >= 1) {
         motionScrubVideo.style.opacity = 1;
         const ratio = currentScroll / scrollMax;
         const t = ratio * (motionScrubVideo.duration - 0.05);
-        if (Math.abs(motionScrubVideo.currentTime - t) > 0.033) {
+        
+        // Only update if difference is meaningful to prevent flickering
+        if (Math.abs(motionScrubVideo.currentTime - t) > 0.016) {
             motionScrubVideo.currentTime = t;
         }
-        motionScrubVideo.style.transform = `translate(-50%, -50%) translateZ(0) scale(${1 + ratio * 0.07})`;
+        motionScrubVideo.style.transform = `translate(-50%, -50%) translateZ(0) scale(${1 + ratio * 0.08})`;
     }
 
     // ── Scroll hint
