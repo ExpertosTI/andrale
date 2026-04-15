@@ -1,51 +1,43 @@
 #!/bin/bash
-# ==============================================================================
-# Wedding Invitation Deployment (Andreína & Alejandro)
-# ==============================================================================
-# Protocol: RENACE.TECH (Local Build + Swarm Stack)
-
 set -e
 
-REPO_URL="https://github.com/ExpertosTI/andrale.git"
-PROJECT_DIR="/var/www/andrale"
-STACK_NAME="anle-wedding"
-SERVICE_NAME="anle-wedding_wedding"
+REPO_DIR="/root/proyectos/secasan"
+STACK_NAME="secasan"
+BRANCH="feature/marketplace-and-deploy"
 
-echo "========================================================"
-echo "🚀 Starting Deployment (Andreína & Alejandro Wedding)..."
-echo "========================================================"
+echo "🚀 Iniciando despliegue de SeCasan en la rama $BRANCH..."
 
-# 1. Sync Code
-if [ -d "$PROJECT_DIR" ]; then
-    echo "📁 Updating existing directory $PROJECT_DIR..."
-    cd "$PROJECT_DIR"
-    git fetch origin main
-    git reset --hard origin/main
+# 1. Sync code
+if [ -d "$REPO_DIR" ]; then
+    cd "$REPO_DIR"
+    git fetch origin $BRANCH
+    git reset --hard origin/$BRANCH
 else
-    echo "📥 Cloning repository to $PROJECT_DIR..."
-    git clone $REPO_URL $PROJECT_DIR
-    cd $PROJECT_DIR
+    # First time clone (User must have SSH keys setup)
+    git clone -b $BRANCH https://github.com/ExpertosTI/www.renace.tech.git $REPO_DIR
+    cd $REPO_DIR
 fi
 
-# 2. Build and deploy
-echo "🐳 Building Docker image locally..."
+# 2. Check env
+if [ ! -f ".env" ]; then
+    echo "WEDDING_ADMIN_KEY=secasan123" > .env
+    echo "⚠️ .env creado con valores por defecto. Edítalo si es necesario."
+fi
+
+# 3. Build image
+echo "📦 Construyendo imagen Docker..."
 docker compose build
 
-echo "🚀 Deploying stack to Docker Swarm (RenaceNet)..."
-# Ensure RenaceNet exists (Standard Renace Protocol)
+# 4. Ensure Network
 docker network ls | grep RenaceNet > /dev/null || docker network create --driver overlay RenaceNet
 
+# 5. Deploy Stack
+echo "🚢 Lanzando Stack SeCasan..."
+set -a; source .env; set +a
 docker stack deploy -c docker-compose.yml $STACK_NAME
 
-# 3. Force Pickup
-echo "🔄 Forcing Swarm to pick up the new local image..."
-docker service update --force $SERVICE_NAME 2>/dev/null || true
+# 6. Force update to pick up new image
+docker service update --force ${STACK_NAME}_main
 
-# 4. Clean up
-echo "🧹 Cleaning up unused Docker images..."
-docker image prune -f
-
-echo "========================================================"
-echo "✅ Deployment successful!"
-echo "📡 URL: https://anle.renace.tech"
-echo "========================================================"
+echo "✅ Despliegue completado."
+echo "🌍 Revisa en: https://secasan.renace.tech"

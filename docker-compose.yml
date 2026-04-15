@@ -1,48 +1,41 @@
 version: '3.8'
 
 services:
-  wedding:
-    image: andreina-alejandro-wedding:latest
-    build: .
-    container_name: andreina-alejandro-wedding
-    restart: always
+  main:
+    image: secasan:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - TZ=America/Santo_Domingo
-      - WEDDING_PORT=3000
+      - WEDDING_ADMIN_KEY=${WEDDING_ADMIN_KEY:-secasan123}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     volumes:
-      - wedding-data:/app/data
+      - secasan_data:/app/data
+      - secasan_uploads:/app/assets/uploads
     networks:
       - RenaceNet
     deploy:
-      replicas: 1
       restart_policy:
         condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1G
       labels:
         - "traefik.enable=true"
-        # Router HTTP (Redirect to HTTPS)
-        - "traefik.http.routers.anle-wedding-http.rule=Host(`anle.renace.tech`)"
-        - "traefik.http.routers.anle-wedding-http.entrypoints=web"
-        - "traefik.http.routers.anle-wedding-http.middlewares=anle-wedding-redirect-https"
-        
-        # Router HTTPS (Secure Access)
-        - "traefik.http.routers.anle-wedding-https.rule=Host(`anle.renace.tech`)"
-        - "traefik.http.routers.anle-wedding-https.entrypoints=websecure"
-        - "traefik.http.routers.anle-wedding-https.tls=true"
-        - "traefik.http.routers.anle-wedding-https.tls.certresolver=letsencryptresolver"
-        - "traefik.http.routers.anle-wedding-https.tls.domains[0].main=anle.renace.tech"
-        
-        # Middlewares
-        - "traefik.http.middlewares.anle-wedding-redirect-https.redirectscheme.scheme=https"
-        
-        # Service Configuration (Load Balancer to Port 3000)
-        - "traefik.http.routers.anle-wedding-https.service=anle-wedding-svc"
-        - "traefik.http.services.anle-wedding-svc.loadbalancer.server.port=3000"
-        
-        - "traefik.docker.network=RenaceNet"
-
-volumes:
-  wedding-data:
+        - "traefik.http.routers.secasan.rule=Host(`secasan.renace.tech`)"
+        - "traefik.http.routers.secasan.entrypoints=websecure"
+        - "traefik.http.routers.secasan.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.secasan.loadbalancer.server.port=3000"
+        # Optional: Redirect HTTP to HTTPS
+        - "traefik.http.routers.secasan-http.rule=Host(`secasan.renace.tech`)"
+        - "traefik.http.routers.secasan-http.entrypoints=web"
+        - "traefik.http.routers.secasan-http.middlewares=redirect-to-https"
 
 networks:
   RenaceNet:
     external: true
+
+volumes:
+  secasan_data:
+  secasan_uploads:
