@@ -3,30 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | SeCasan AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Dashboard | SeCasan Premium</title>
+    <link rel="stylesheet" href="/assets/premium-theme.css">
     <script src="https://unpkg.com/lucide@0.525.0"></script>
     <style>
-        :root { --gold: #c5a059; --dark: #0a0e17; --card: #161c2a; }
-        body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; }
-        .sidebar { width: 280px; background: #0f141f; border-right: 1px solid rgba(255,255,255,0.1); padding: 30px; }
-        .main { flex: 1; padding: 40px; overflow-y: auto; }
-        .card { background: var(--card); border-radius: 15px; padding: 30px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        h2 { margin-top: 0; font-weight: 600; }
-        .ai-input { width: 100%; background: #0a0e17; border: 1px solid var(--gold); border-radius: 10px; color: white; padding: 20px; font-size: 1rem; margin-bottom: 20px; resize: none; }
-        .btn { background: var(--gold); border: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .btn:hover { opacity: 0.9; transform: scale(1.02); }
-        .preview-pane { display: none; margin-top: 30px; }
-        .json-editor { background: #000; color: #0f0; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; overflow: auto; max-height: 300px; }
-        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; background: rgba(197, 160, 89, 0.2); color: var(--gold); }
+        body { display: flex; height: 100vh; background: #080A0E; margin: 0; }
+        .sidebar { width: 300px; padding: 40px; border-right: 1px solid var(--glass-border); z-index: 10; height: 100vh; flex-shrink: 0; }
+        .sidebar h1 { font-family: 'Playfair Display', serif; font-weight: 700; }
+        .main { flex: 1; padding: 60px; overflow-y: auto; background: radial-gradient(circle at 10% 10%, #151921 0%, #080a0e 100%); }
+        
+        .nav-item { display:flex; align-items:center; gap:15px; margin-bottom:30px; cursor:pointer; opacity:0.4; transition: 0.3s; color: white; text-decoration: none; font-size: 1rem; }
+        .nav-item:hover, .nav-item.active { opacity: 1; color: var(--gold); }
+        .nav-item i { width: 20px; }
+
+        .card { padding: 40px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gold); opacity: 0; transition: 0.3s; }
+        .card:hover::before { opacity: 1; }
+
+        .ai-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 12px; color: white; padding: 25px; font-size: 1.1rem; margin-bottom: 25px; outline: none; transition: 0.3s; font-family: 'Outfit'; resize: none; }
+        .ai-input:focus { border-color: var(--gold); box-shadow: 0 0 15px var(--gold-glow); }
+
+        .restricted-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(8,10,14,0.95); z-index: 9999; 
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .theme-card { cursor: pointer; border: 1px solid var(--glass-border); border-radius: 15px; padding: 15px; text-align: center; transition: 0.3s; background: rgba(255,255,255,0.02); min-width: 160px; }
+        .theme-card:hover { transform: scale(1.05); border-color: var(--gold); }
+        .theme-card.active { border-color: var(--gold); background: rgba(212, 175, 55, 0.05); }
+        
+        #json-view { background: #000; padding: 20px; border-radius: 10px; font-family: monospace; color: #D4AF37; overflow: auto; max-height: 400px; white-space: pre-wrap; word-break: break-all; }
+        .asset-thumb { width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.1); cursor:pointer; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2 style="color:var(--gold)">SeCasan.</h2>
-        <nav style="margin-top: 50px;">
+    <div id="auth-wall" class="restricted-overlay" style="display:none;">
+        <div class="glass" style="padding: 60px; max-width: 500px;">
+            <i data-lucide="lock" size="48" style="color:var(--gold); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 15px;">Acceso Restringido</h2>
+            <p style="opacity: 0.7; margin-bottom: 30px;">SeCasan Premium requiere una llave de acceso para gestionar la plataforma.</p>
+            <input type="password" id="wall-key" class="ai-input" style="text-align:center;" placeholder="Introduce ADMIN_KEY">
+            <button class="btn-gold" onclick="tryAuth()">VALIDAR ACCESO</button>
+        </div>
+    </div>
+
+    <div class="sidebar glass">
+        <h1 style="color:var(--gold); font-size: 2.2rem; margin-bottom: 60px;">SeCasan.</h1>
+        <nav>
             <div class="nav-item active" onclick="showTab('create')" id="nav-create">
-                <i data-lucide="layout"></i> Mis Bodas
+                <i data-lucide="sparkles"></i> Mis Bodas
             </div>
             <div class="nav-item" onclick="showTab('library')" id="nav-library">
                 <i data-lucide="library"></i> Biblioteca
@@ -34,114 +61,110 @@
             <div class="nav-item" onclick="showTab('settings')" id="nav-settings">
                 <i data-lucide="settings"></i> Ajustes
             </div>
+            <a href="/" class="nav-item" style="margin-top: 100px; opacity: 0.3;">
+                <i data-lucide="external-link"></i> Ver Landing
+            </a>
         </nav>
     </div>
-    <div class="main">
-        <div id="tab-create">
-            <div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <h2>Panel de Creación "One-Shot"</h2>
-                <div id="admin-status" class="status-badge">REQUERIDO: ADMIN_KEY</div>
-            </div>
 
-            <div class="card">
-                <h3>1. Personaliza tu Estilo</h3>
-                <div id="themes-list" style="display:flex; gap:20px; margin:20px 0; overflow-x:auto; padding-bottom:10px;">
-                    <!-- Themes will be loaded here -->
-                    <p style="opacity:0.5;">Cargando temas...</p>
+    <div class="main">
+        <div id="tab-create" class="reveal visible">
+            <h2 style="font-size: 2.5rem; margin-bottom: 40px;">Creación Magnética</h2>
+            
+            <div class="card glass">
+                <h3 class="text-luxury">1. Selección de Estética</h3>
+                <div id="themes-list" style="display:flex; gap:20px; margin:30px 0; overflow-x:auto; padding-bottom:15px;">
+                    <p style="opacity:0.5;">Cargando temas del marketplace...</p>
                 </div>
 
-                <h3>2. ¿Cómo será tu boda?</h3>
-                <p style="opacity:0.6; font-size:0.9rem;">Describe tu visión y nuestra IA generará el contenido.</p>
-                <textarea id="ai-prompt" class="ai-input" rows="4" placeholder="Ej: Boda de Adriana y Luis en las playas de Samaná..."></textarea>
-                <button class="btn" onclick="generateWedding()">GENERAR CON IA ✨</button>
+                <h3 class="text-luxury">2. Visión Poética</h3>
+                <p style="opacity:0.6; margin-bottom: 20px;">Habla sobre la pareja, el lugar y la atmósfera que deseas proyectar.</p>
+                <textarea id="ai-prompt" class="ai-input" rows="4" placeholder="Ej: Adriana y Luis, elegante atardecer frente al mar..."></textarea>
+                <button class="btn-gold" id="gen-btn" onclick="generateWedding()">COMENZAR GENERACIÓN ✨</button>
             </div>
 
-            <div id="ai-result" class="preview-pane">
-                <div class="card">
-                    <h3>3. Revisión de Contenido</h3>
-                    <p>Verifica los datos generados antes de publicar:</p>
-                    <div id="json-view" class="json-editor"></div>
-                    <div style="margin-top:20px; display:flex; gap:15px;">
-                        <button class="btn" style="background:#22c55e; color:white;" onclick="saveWedding()">PUBLICAR AHORA 🚀</button>
-                        <button class="btn" style="background:#444;" onclick="document.getElementById('ai-result').style.display='none'">CANCELAR</button>
-                    </div>
+            <div id="ai-result" class="card glass" style="display:none;">
+                <h3 class="text-luxury">3. Manuscrito Digital</h3>
+                <div id="json-view"></div>
+                <div style="margin-top:30px; display:flex; gap:20px;">
+                    <button class="btn-gold" style="background:#22c55e; box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);" onclick="saveWedding()">PUBLICAR OBRA 🚀</button>
+                    <button class="btn-gold" style="background:#333; color:white; box-shadow:none;" onclick="document.getElementById('ai-result').style.display='none'">DESCARTAR</button>
                 </div>
             </div>
         </div>
 
         <div id="tab-library" style="display:none;">
-            <div class="header" style="margin-bottom:40px;">
-                <h2>Biblioteca de Recursos</h2>
-            </div>
-            
-            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
-                <div class="card">
-                    <h3>Mis Recursos (Imágenes / Videos)</h3>
-                    <div id="assets-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:15px; margin-top:20px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 40px;">Bóveda de Recursos</h2>
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:30px;">
+                <div class="card glass">
+                    <h3 class="text-luxury">Inventario Multimedia</h3>
+                    <div id="assets-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:20px; margin-top:25px;">
                         <!-- Assets loaded here -->
                     </div>
                 </div>
-                
-                <div class="card">
-                    <h3>Subir Nuevo</h3>
-                    <form id="upload-form" onsubmit="handleUpload(event)">
-                        <input type="file" id="asset-file" class="ai-input" style="padding:10px;">
-                        <input type="text" id="asset-name" class="ai-input" style="padding:10px;" placeholder="Nombre del recurso">
-                        <button class="btn" type="submit" style="width:100%">SUBIR AHORA ⬆️</button>
+                <div class="card glass">
+                    <h3 class="text-luxury">Añadir Recurso</h3>
+                    <form onsubmit="handleUpload(event)" style="margin-top:20px;">
+                        <div style="margin-bottom:15px;">
+                            <label class="text-luxury" style="font-size:0.7rem;">Archivo local</label>
+                            <input type="file" id="asset-file" class="ai-input" style="padding:15px; font-size:0.8rem;">
+                        </div>
+                        <input type="text" id="asset-name" class="ai-input" style="padding:15px;" placeholder="Nombre de referencia">
+                        <button class="btn-gold" style="width:100%">SUBIR A LA NUBE ⬆️</button>
                     </form>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top:20px;">
-                <h3>Registrar Nuevo Tema</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:15px;">
-                    <div>
-                        <input type="text" id="new-theme-id" class="ai-input" placeholder="ID (ej: dark-vintage)">
-                        <input type="text" id="new-theme-name" class="ai-input" placeholder="Nombre (ej: Vintage Nocturno)">
-                    </div>
-                    <div>
-                        <input type="text" id="new-theme-asset" class="ai-input" placeholder="URL del fondo (/assets/...)">
-                        <input type="text" id="new-theme-thumb" class="ai-input" placeholder="URL Miniatura (URL imagen)">
+                    
+                    <hr style="opacity:0.1; margin: 30px 0;">
+                    
+                    <h3 class="text-luxury">Registrar Tema</h3>
+                    <div style="margin-top:20px;">
+                        <input type="text" id="new-theme-id" class="ai-input" style="padding:12px; font-size:0.9rem;" placeholder="ID (ej: dark-vintage)">
+                        <input type="text" id="new-theme-name" class="ai-input" style="padding:12px; font-size:0.9rem;" placeholder="Nombre visible">
+                        <input type="text" id="new-theme-thumb" class="ai-input" style="padding:12px; font-size:0.9rem;" placeholder="URL Miniatura">
+                        <input type="text" id="new-theme-asset" class="ai-input" style="padding:12px; font-size:0.9rem;" placeholder="Ruta Asset (/assets/...)">
+                        <button class="btn-gold" style="width:100%; background:#444;" onclick="saveNewTheme()">AÑADIR TEMA ➕</button>
                     </div>
                 </div>
-                <button class="btn" onclick="saveNewTheme()" style="background:var(--gold); color:white;">AÑADIR A LA LIBRERÍA ➕</button>
             </div>
         </div>
 
         <div id="tab-settings" style="display:none;">
-            <!-- Settings content stays similar -->
+            <h2 style="font-size: 2.5rem; margin-bottom: 40px;">Arquitectura de IA</h2>
+            <div class="card glass">
+                <div style="margin-bottom:30px;">
+                    <label class="text-luxury">Google Flash 2.0 Key</label>
+                    <input type="password" id="set-google-key" class="ai-input" placeholder="••••••••••••••••">
+                </div>
+                <div style="margin-bottom:30px;">
+                    <label class="text-luxury">Anthropic Key</label>
+                    <input type="password" id="set-anthropic-key" class="ai-input" placeholder="••••••••••••••••">
+                </div>
+                <div style="margin-bottom:30px;">
+                    <label class="text-luxury">Proveedor Activo</label>
+                    <select id="set-ai-provider" class="ai-input" style="height:auto;">
+                        <option value="google">Google Gemini 2.0 Flash</option>
+                        <option value="anthropic">Anthropic Claude 3 Opus</option>
+                    </select>
+                </div>
+                <button class="btn-gold" onclick="saveSettings()">SINCRONIZAR AJUSTES ✅</button>
+            </div>
         </div>
     </div>
 
-    <style>
-        .nav-item { display:flex; align-items:center; gap:10px; margin-bottom:25px; cursor:pointer; opacity:0.6; transition: 0.3s; }
-        .nav-item:hover { opacity: 1; color: var(--gold); }
-        .nav-item.active { opacity: 1; color: var(--gold); font-weight: 600; }
-        .theme-card { transition: 0.3s; background: rgba(255,255,255,0.03); min-width: 180px; }
-        .theme-card:hover { background: rgba(255,255,255,0.08); }
-        .asset-thumb { width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.1); cursor:pointer; }
-    </style>
-
     <script>
         lucide.createIcons();
-        let generatedContent = null;
+        let adminKey = new URLSearchParams(window.location.search).get('key');
         let selectedTheme = 'roses-premium';
-        let allThemes = [];
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const adminKey = urlParams.get('key');
-        
-        if(adminKey) {
-            document.getElementById('admin-status').innerText = "ACCESO AUTORIZADO";
-            document.getElementById('admin-status').style.background = "rgba(34, 197, 94, 0.2)";
-            document.getElementById('admin-status').style.color = "#22c55e";
+        let generatedContent = null;
+
+        if (!adminKey) {
+            document.getElementById('auth-wall').style.display = 'flex';
+        } else {
             initDashboard();
         }
 
-        async function initDashboard() {
-            await loadThemes();
-            await loadAssets();
-            await loadSettings();
+        function tryAuth() {
+            const key = document.getElementById('wall-key').value;
+            if (key) window.location.href = `?key=${key}`;
         }
 
         function showTab(tab) {
@@ -152,31 +175,30 @@
             });
         }
 
+        async function initDashboard() {
+            loadThemes();
+            loadAssets();
+            loadSettings();
+        }
+
         async function loadThemes() {
             try {
                 const res = await fetch('/api/themes');
-                allThemes = await res.json();
-                renderThemes();
-            } catch(e) { console.error("Error loading themes"); }
-        }
-
-        function renderThemes() {
-            const container = document.getElementById('themes-list');
-            container.innerHTML = allThemes.map(t => `
-                <label style="cursor:pointer;">
-                    <input type="radio" name="theme" value="${t.id}" ${t.id === selectedTheme ? 'checked' : ''} style="display:none;">
-                    <div class="theme-card" onclick="selectTheme(this)" data-theme="${t.id}" style="${t.id === selectedTheme ? 'border:2px solid var(--gold);' : 'border:1px solid rgba(255,255,255,0.1);'} padding:15px; border-radius:10px; text-align:center;">
-                        <img src="${t.thumbnail}" style="width:100%; height:80px; object-fit:cover; border-radius:5px; margin-bottom:10px;">
-                        <strong style="display:block; font-size:0.8rem;">${t.name}</strong>
+                const themes = await res.json();
+                const container = document.getElementById('themes-list');
+                container.innerHTML = themes.map(t => `
+                    <div class="theme-card ${t.id === selectedTheme ? 'active' : ''}" onclick="selectTheme('${t.id}', this)" data-theme="${t.id}">
+                        <img src="${t.thumbnail}" style="width:100%; height:90px; object-fit:cover; border-radius:10px; margin-bottom:10px;">
+                        <div style="font-size:0.8rem; font-weight:600;">${t.name}</div>
                     </div>
-                </label>
-            `).join('');
+                `).join('');
+            } catch(e) {}
         }
 
-        function selectTheme(el) {
-            document.querySelectorAll('.theme-card').forEach(c => c.style.border = '1px solid rgba(255,255,255,0.1)');
-            el.style.border = '2px solid var(--gold)';
-            selectedTheme = el.dataset.theme;
+        function selectTheme(id, el) {
+            document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            selectedTheme = id;
         }
 
         async function loadAssets() {
@@ -187,7 +209,7 @@
                 container.innerHTML = assets.map(a => `
                     <div title="${a.name}" onclick="copyPath('${a.path}')">
                         ${a.type === 'video' ? `<div class="asset-thumb" style="display:flex; align-items:center; justify-content:center; background:#000;"><i data-lucide="video"></i></div>` : `<img src="${a.path}" class="asset-thumb">`}
-                        <p style="font-size:0.6rem; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${a.name}</p>
+                        <p style="font-size:0.6rem; margin-top:5px; opacity:0.5; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${a.name}</p>
                     </div>
                 `).join('');
                 lucide.createIcons();
@@ -199,26 +221,74 @@
             alert("Ruta copiada: " + path);
         }
 
+        async function generateWedding() {
+            const prompt = document.getElementById('ai-prompt').value;
+            if(!prompt) return alert("Escribe una visión poética.");
+            const btn = document.getElementById('gen-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "IA ESTÁ ESCRIBIENDO...";
+            
+            try {
+                const res = await fetch(`/api/ai/generate?key=${adminKey}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await res.json();
+                generatedContent = data;
+                document.getElementById('json-view').innerText = JSON.stringify(data, null, 2);
+                document.getElementById('ai-result').style.display = 'block';
+                document.getElementById('ai-result').scrollIntoView({ behavior: 'smooth' });
+            } catch(e) { alert("Error"); }
+            btn.innerText = originalText;
+        }
+
+        async function loadSettings() {
+            try {
+                const res = await fetch(`/api/settings?key=${adminKey}`);
+                const data = await res.json();
+                if(data.google_key) document.getElementById('set-google-key').value = data.google_key;
+                if(data.anthropic_key) document.getElementById('set-anthropic-key').value = data.anthropic_key;
+                if(data.ai_provider) document.getElementById('set-ai-provider').value = data.ai_provider;
+            } catch(e) {}
+        }
+
+        async function saveSettings() {
+            await fetch(`/api/settings?key=${adminKey}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    google_key: document.getElementById('set-google-key').value,
+                    anthropic_key: document.getElementById('set-anthropic-key').value,
+                    ai_provider: document.getElementById('set-ai-provider').value
+                })
+            });
+            alert("Sincronización completa.");
+        }
+        
+        async function saveWedding() {
+            const slug = prompt("URL Boda (ej: marta-y-pedro):")?.toLowerCase().trim();
+            if(!slug) return;
+            const res = await fetch(`/api/wedding/create?key=${adminKey}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ slug, theme_id: selectedTheme, content: generatedContent })
+            });
+            if(res.ok) window.location.href = `/v/${slug}`;
+        }
+
         async function handleUpload(e) {
             e.preventDefault();
             const file = document.getElementById('asset-file').files[0];
+            const name = document.getElementById('asset-name').value;
             if(!file) return alert("Selecciona un archivo");
-            
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('name', name);
 
-            try {
-                const res = await fetch(`/api/upload?key=${adminKey}`, {
-                    method: 'POST',
-                    body: formData
-                });
-                if(res.ok) {
-                    alert("Subido!");
-                    loadAssets();
-                } else {
-                    alert("Fallo en la subida (Multer solo disponible en Producción). Usa rutas externas por ahora.");
-                }
-            } catch(e) { alert("Error de servidor."); }
+            const res = await fetch(`/api/upload?key=${adminKey}`, { method: 'POST', body: formData });
+            if(res.ok) { alert("Subido con éxito"); loadAssets(); }
+            else { alert("Error en subida (Multer solo en Producción)"); }
         }
 
         async function saveNewTheme() {
@@ -228,106 +298,12 @@
                 thumbnail: document.getElementById('new-theme-thumb').value,
                 asset_url: document.getElementById('new-theme-asset').value
             };
-
-            try {
-                const res = await fetch(`/api/themes?key=${adminKey}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(theme)
-                });
-                if(res.ok) {
-                    alert("Tema añadido!");
-                    loadThemes();
-                }
-            } catch(e) {}
-        }
-
-        // --- REST OF THE METHODS (generateWedding, saveWedding, loadSettings, saveSettings) ---
-        // I will keep them below, replacing the placeholder for tab-settings
-
-        async function saveSettings() {
-            try {
-                const res = await fetch(`/api/settings?key=${adminKey}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        google_key: document.getElementById('set-google-key').value,
-                        anthropic_key: document.getElementById('set-anthropic-key').value,
-                        ai_provider: document.getElementById('set-ai-provider').value
-                    })
-                });
-                if(res.ok) alert("Ajustes guardados correctamente.");
-            } catch(e) { alert("Error al guardar."); }
-        }
-
-        function selectTheme(el) {
-            document.querySelectorAll('.theme-card').forEach(c => c.style.border = '1px solid rgba(255,255,255,0.1)');
-            el.style.border = '2px solid var(--gold)';
-            selectedTheme = el.dataset.theme;
-        }
-
-        async function generateWedding() {
-            const prompt = document.getElementById('ai-prompt').value;
-            if(!prompt) return alert("Por favor, describe algo.");
-            if(!adminKey) return alert("Error: Se requiere ADMIN_KEY.");
-            
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "IA PENSANDO...";
-            btn.disabled = true;
-
-            try {
-                const res = await fetch(`/api/ai/generate?key=${adminKey}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ prompt })
-                });
-                
-                if(!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.error || "Fallo la IA");
-                }
-                
-                const data = await res.json();
-                generatedContent = data;
-                
-                document.getElementById('json-view').innerText = JSON.stringify(data, null, 2);
-                document.getElementById('ai-result').style.display = 'block';
-                document.getElementById('ai-result').scrollIntoView({ behavior: 'smooth' });
-            } catch(e) {
-                alert("Error: " + e.message);
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        async function saveWedding() {
-            const slug = prompt("URL personalizada (ej: marta-y-pedro):")?.toLowerCase().trim();
-            if(!slug) return;
-
-            try {
-                const res = await fetch(`/api/wedding/create?key=${adminKey}`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        slug, 
-                        title: `Boda: ${slug}`,
-                        theme_id: selectedTheme,
-                        content: generatedContent 
-                    })
-                });
-                
-                const data = await res.json();
-                if(res.ok && data.success) {
-                    alert("¡Boda publicada!");
-                    window.location.href = `/v/${slug}`;
-                } else {
-                    alert("Error: " + (data.error || "No se pudo guardar."));
-                }
-            } catch(e) {
-                alert("Error de conexión al guardar.");
-            }
+            const res = await fetch(`/api/themes?key=${adminKey}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(theme)
+            });
+            if(res.ok) { alert("Tema añadido!"); loadThemes(); }
         }
     </script>
 </body>
