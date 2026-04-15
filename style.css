@@ -8,11 +8,11 @@
     --bg-secondary: #111827;
     --accent-gold: #C8A890;
     --accent-gold-light: #e0c5ad;
-    --accent-teal: #2dd4bf;
+    --accent-teal: #C8A890; /* Swapped to Gold */
     --accent-purple: #8b5cf6;
     --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --text-secondary: #ffffff; /* Swapped from bluish-gray to pure white */
+    --text-muted: #94a3b8;
     --text-dark: #1a1a2e;
     --glass-bg: rgba(10, 10, 20, 0.55);
     --glass-bg-light: rgba(255, 255, 255, 0.06);
@@ -48,10 +48,30 @@ body {
 }
 .loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
+/* --- Logo Reveal Logic --- */
+.logo-loader-wrap {
+    position: relative;
+    width: 85vw; max-width: 400px;
+    margin-bottom: 20px;
+}
+.logo-loader-bg {
+    width: 100%; height: auto;
+    opacity: 0.2;
+    filter: brightness(0) invert(1) grayscale(1);
+}
+.logo-loader-fill {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: auto;
+    /* This will be the colored one revealing */
+    filter: drop-shadow(0 2px 10px rgba(200, 168, 144, 0.4));
+    clip-path: inset(100% 0 0 0); /* Start from bottom */
+    transition: clip-path 0.4s ease;
+}
+
 @keyframes fadeInPulse {
     0% { opacity: 0; transform: scale(0.9); }
     50% { opacity: 1; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1.02); }
 }
 
 /* ===================================
@@ -81,7 +101,7 @@ body {
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
     background: transparent;
     pointer-events: none;
-    padding-bottom: 60px;
+    padding-bottom: 120px; /* Moved up closer to content */
     transition: opacity 0.6s ease;
 }
 .entrance-overlay.is-hidden { opacity: 0; }

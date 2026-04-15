@@ -18,8 +18,7 @@ let experienceStarted = true; // immediate
 
 // ─── PRELOADER & VIDEO BLOB ──────────────────────────────────────────────────
 const preloader = document.getElementById('preloader');
-const loaderProgress = document.getElementById('loader-progress');
-const loaderText = document.getElementById('loader-text');
+const logoFill = document.getElementById('logo-loader-fill');
 
 /**
  * Advanced Asset Loading: Fetching video as Blob to prevent
@@ -43,11 +42,10 @@ async function loadVideoAsBlob() {
             chunks.push(value);
             receivedLength += value.length;
             
-            // Update UI
-            if (contentLength && loaderProgress) {
+            // Update Logo Fill (Bottom-up reveal)
+            if (contentLength && logoFill) {
                 const percent = Math.round((receivedLength / contentLength) * 100);
-                loaderProgress.style.width = `${percent}%`;
-                if (loaderText) loaderText.innerText = `RECOLECTANDO PÉTALOS... ${percent}%`;
+                logoFill.style.clipPath = `inset(${100 - percent}% 0 0 0)`;
             }
         }
 
@@ -58,13 +56,11 @@ async function loadVideoAsBlob() {
             motionScrubVideo.src = objectUrl;
             // Wait for metadata/first frame
             motionScrubVideo.addEventListener('loadeddata', () => {
-                if (loaderText) loaderText.innerText = "¡TODO LISTO!";
                 setTimeout(revealInvitation, 800);
             }, { once: true });
         }
     } catch (error) {
         console.error('Video load failed:', error);
-        // Fallback for direct loading if fetch fails
         if (motionScrubVideo) {
             motionScrubVideo.src = videoUrl;
             setTimeout(revealInvitation, 1000);
