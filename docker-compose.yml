@@ -25,6 +25,7 @@ services:
         - "traefik.http.routers.wedding-https.entrypoints=websecure"
         - "traefik.http.routers.wedding-https.tls=true"
         - "traefik.http.routers.wedding-https.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.wedding-https.tls.domains[0].main=anle.renace.tech"
         - "traefik.http.routers.wedding-https.service=wedding-svc"
         - "traefik.http.middlewares.wedding-redirect-https.redirectscheme.scheme=https"
         - "traefik.http.services.wedding-svc.loadbalancer.server.port=80"
