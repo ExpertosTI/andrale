@@ -38,8 +38,21 @@ db.exec(`
         name TEXT NOT NULL,
         message TEXT DEFAULT '',
         guests INTEGER DEFAULT 1,
+        ip TEXT DEFAULT '',
         created_at TEXT DEFAULT (datetime('now', 'localtime'))
     );
+    -- Migration: Add ip column if it doesn't exist (SQLite 3.35+ or careful check)
+    PRAGMA table_info(rsvp);
+` );
+
+// Ensure 'ip' column exists in rsvp
+try {
+    db.prepare("ALTER TABLE rsvp ADD COLUMN ip TEXT DEFAULT ''").run();
+} catch (e) {
+    // Column already exists or other error
+}
+
+db.exec(`
     CREATE TABLE IF NOT EXISTS events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         type TEXT NOT NULL,
@@ -86,15 +99,35 @@ app.use((req, res, next) => {
 app.post('/api/rsvp', (req, res) => {
     try {
         const { name, message, guests } = req.body;
+        const ip = req.ip || req.get('x-forwarded-for') || 'unknown';
+
         if (!name || name.trim().length === 0) {
             return res.status(400).json({ error: 'El nombre es requerido' });
         }
-        const stmt = db.prepare('INSERT INTO rsvp (name, message, guests) VALUES (?, ?, ?)');
-        stmt.run(name.trim(), (message || '').trim(), guests || 1);
+
+        const normalizedName = name.trim().toLowerCase();
+
+        // ─── ANTI-SPAM CHECK ───
+        // Check if name already exists
+        const existingName = db.prepare("SELECT id FROM rsvp WHERE LOWER(TRIM(name)) = ?").get(normalizedName);
+        if (existingName) {
+            return res.status(409).json({ error: 'Ya has confirmado anteriormente.' });
+        }
+
+        // Check if IP already exists
+        if (ip !== 'unknown' && ip !== '::1' && ip !== '127.0.0.1') {
+            const existingIp = db.prepare("SELECT id FROM rsvp WHERE ip = ?").get(ip);
+            if (existingIp) {
+                return res.status(409).json({ error: 'Ya se ha realizado una confirmación desde este dispositivo.' });
+            }
+        }
+
+        const stmt = db.prepare('INSERT INTO rsvp (name, message, guests, ip) VALUES (?, ?, ?, ?)');
+        stmt.run(name.trim(), (message || '').trim(), guests || 1, ip);
 
         // Also track as event
         const evtStmt = db.prepare('INSERT INTO events (type, meta, ip, user_agent) VALUES (?, ?, ?, ?)');
-        evtStmt.run('rsvp_confirm', JSON.stringify({ name: name.trim() }), req.ip, req.get('user-agent') || '');
+        evtStmt.run('rsvp_confirm', JSON.stringify({ name: name.trim() }), ip, req.get('user-agent') || '');
 
         res.json({ success: true, message: '¡Confirmado!' });
     } catch (e) {
