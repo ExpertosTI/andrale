@@ -16,89 +16,56 @@ let targetScroll = 0;
 let currentScroll = 0;
 let experienceStarted = true; // immediate
 
-// ─── PRELOADER & VIDEO ARCHITECTURE (ALTAMAR TECHNIQUE) ──────────────────────
+// ─── PRELOADER & VIDEO LOADING ─────────────────────────────────────────────
 const preloader = document.getElementById('preloader');
 const logoFill = document.getElementById('logo-loader-fill');
 
-const VIDEO_CONFIG = {
-    starter: 'assets/the-bride-scrub.mp4', // Level 1: Optimized/Comprimido
-    master: 'assets/rosas-fondo.mp4'       // Level 2: Master HQ
-};
+const VIDEO_SOURCE = 'assets/rosas-fondo.mp4';
 
 /**
- * Stage 1: Load the Starter video immediately.
- * This allows the preloader to disappear as soon as the first frame is ready.
+ * Stage 1: Load the correct Roses video.
+ * We use standard video loading to avoid CORS issues with fetch() in production.
  */
-function initDualVideoLoading() {
+function initVideoLoading() {
     if (!motionScrubVideo) return;
 
-    // Load Starter version
-    motionScrubVideo.src = VIDEO_CONFIG.starter;
+    // Simulate preloader progress (Golden reveal)
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 5;
+        if (progress > 85) {
+            clearInterval(interval);
+        }
+        if (logoFill) {
+            logoFill.style.clipPath = `inset(${100 - progress}% 0 0 0)`;
+        }
+    }, 100);
+
+    // Initial load
+    motionScrubVideo.src = VIDEO_SOURCE;
     motionScrubVideo.load();
 
+    // The logic: preloader reveals as the video metadata/first frame is ready
     motionScrubVideo.addEventListener('loadeddata', () => {
-        console.log("Stage 1: Starter Video Ready.");
-        // Reveal site as soon as background is visible
-        setTimeout(revealInvitation, 500);
-        // Start downloading Master version in background
-        loadMasterBackground();
-    }, { once: true });
-}
-
-/**
- * Stage 2: Fetch Master video as Blob in background.
- */
-async function loadMasterBackground() {
-    try {
-        const response = await fetch(VIDEO_CONFIG.master);
-        if (!response.ok) throw new Error('Master load failed');
-        
-        const reader = response.body.getReader();
-        const contentLength = +response.headers.get('Content-Length');
-        
-        let receivedLength = 0;
-        let chunks = [];
-        
-        while(true) {
-            const {done, value} = await reader.read();
-            if (done) break;
-            chunks.push(value);
-            receivedLength += value.length;
-            
-            // Log progress if needed (internal)
-            if (contentLength && logoFill && preloader.style.display !== 'none') {
-                const percent = Math.round((receivedLength / contentLength) * 100);
-                logoFill.style.clipPath = `inset(${100 - percent}% 0 0 0)`;
-            }
+        console.log("Video Ready: Roses Fondo.");
+        clearInterval(interval);
+        if (logoFill) {
+            logoFill.style.clipPath = `inset(0% 0 0 0)`;
         }
+        // Force Safari to render first frame
+        motionScrubVideo.currentTime = 0.001; 
+        // Reveal invitation with a slight delay for smoothness
+        setTimeout(revealInvitation, 1000);
+    }, { once: true });
 
-        const blob = new Blob(chunks);
-        const objectUrl = URL.createObjectURL(blob);
-        
-        // Stage 3: Seamless Swap
-        seamlessSwap(objectUrl);
-        
-    } catch (error) {
-        console.error('Master Stage failed:', error);
-    }
-}
-
-/**
- * Swaps video source without interrupting scroll position or view.
- */
-function seamlessSwap(newSrc) {
-    if (!motionScrubVideo) return;
-    
-    const currentTime = motionScrubVideo.currentTime;
-    console.log("Stage 3: Seamless Swap to Master HQ.");
-    
-    // We create a temporary hidden video to ensure it's buffered? 
-    // Usually browser handles src swap well if cached as blob
-    motionScrubVideo.src = newSrc;
-    motionScrubVideo.currentTime = currentTime;
-    
-    // Smooth fade transition if possible? 
-    // Browsers might flicker. Altamar uses a direct swap.
+    // Fallback: If video fails for some reason, don't trap the user
+    setTimeout(() => {
+        if (preloader && preloader.style.display !== 'none') {
+            console.warn("Video load timeout. Forcing reveal.");
+            clearInterval(interval);
+            revealInvitation();
+        }
+    }, 6000);
 }
 
 function revealInvitation() {
@@ -113,7 +80,7 @@ function revealInvitation() {
 
 // Start loading sequence
 if (preloader) {
-    initDualVideoLoading();
+    initVideoLoading();
 }
 
 // ─── CANVAS RESIZE ────────────────────────────────────────────────────────
