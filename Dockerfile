@@ -1,9 +1,17 @@
 FROM node:20-alpine
+
 WORKDIR /app
-RUN apk add --no-cache tzdata
+
+# Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install --production
+
+# Copy application code
 COPY . .
-RUN mkdir -p /app/data
+
+# Ensure data directory exists for SQLite
+RUN mkdir -p data && chmod 777 data
+
 EXPOSE 3000
+
 CMD ["node", "server.js"]

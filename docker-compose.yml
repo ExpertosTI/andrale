@@ -8,6 +8,7 @@ services:
     restart: always
     environment:
       - TZ=America/Santo_Domingo
+      - WEDDING_ADMIN_KEY=AnleSecure2026!
     volumes:
       - wedding-data:/app/data
     networks:
@@ -28,7 +29,7 @@ services:
         - "traefik.http.routers.anle-wedding-https.tls.domains[0].main=anle.renace.tech"
         - "traefik.http.routers.anle-wedding-https.service=anle-wedding-svc"
         - "traefik.http.middlewares.anle-wedding-redirect-https.redirectscheme.scheme=https"
-        - "traefik.http.services.anle-wedding-svc.loadbalancer.server.port=80"
+        - "traefik.http.services.anle-wedding-svc.loadbalancer.server.port=3000"
         - "traefik.docker.network=RenaceNet"
 
 volumes:
