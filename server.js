@@ -165,8 +165,13 @@ app.use(express.static(__dirname, {
     }
 }));
 
-// Landing Page
+// Root Route: Direct Creator Tool
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+// Legacy Landing (Reference only)
+app.get('/landing', (req, res) => {
     res.sendFile(path.join(__dirname, 'landing.html'));
 });
 

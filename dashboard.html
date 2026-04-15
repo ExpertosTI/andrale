@@ -3,32 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | SeCasan</title>
+    <title>SeCasan | Creador de Invitaciones</title>
     <link rel="stylesheet" href="/assets/premium-theme.css">
     <script src="https://unpkg.com/lucide@0.525.0"></script>
     <style>
-        body { display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 260px; display: flex; flex-direction: column; padding: 24px; }
-        .main { flex: 1; padding: 48px; overflow-y: auto; background: #050505; }
-        
-        .nav-link { 
-            display: flex; align-items: center; gap: 12px; padding: 10px 14px; 
-            border-radius: 6px; color: var(--gray); text-decoration: none; 
-            margin-bottom: 4px; transition: 0.2s; cursor: pointer;
+        body { 
+            display: flex; flex-direction: column; height: 100vh; background: #050505; 
+            font-family: 'Inter', sans-serif;
         }
-        .nav-link:hover, .nav-link.active { background: var(--accents-1); color: var(--fg); }
-        .nav-link i { width: 18px; }
+        .navbar { 
+            height: 64px; border-bottom: 1px solid var(--accents-2); 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 40px; background: #000; flex-shrink: 0;
+        }
+        .main-container { 
+            flex: 1; overflow-y: auto; padding: 60px 20px; 
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .tool-width { width: 100%; max-width: 800px; }
 
-        .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin: 20px 0; }
+        .nav-actions { display: flex; gap: 24px; align-items: center; }
+        .nav-btn { 
+            color: var(--gray); font-size: 13px; font-weight: 500; 
+            cursor: pointer; display: flex; align-items: center; gap: 8px; 
+            transition: 0.2s;
+        }
+        .nav-btn:hover { color: var(--fg); }
+        .nav-btn.active { color: var(--gold); }
+
+        .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; margin: 24px 0; }
         .theme-item { 
             border: 1px solid var(--accents-2); border-radius: 8px; padding: 12px; 
-            cursor: pointer; transition: 0.2s; background: var(--bg);
+            cursor: pointer; transition: 0.2s; background: var(--bg); text-align: center;
         }
         .theme-item:hover { border-color: var(--accents-3); }
         .theme-item.active { border-color: var(--gold); background: var(--gold-dim); }
         .theme-item img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; margin-bottom: 8px; }
 
-        .form-section { margin-bottom: 32px; max-width: 800px; }
         .preview-json { background: #000; border: 1px solid var(--accents-2); border-radius: 8px; padding: 20px; font-family: monospace; font-size: 13px; color: var(--gray); white-space: pre-wrap; margin-top: 16px; }
 
         .restricted-overlay { 
@@ -41,93 +52,79 @@
     <div id="auth-wall" class="restricted-overlay" style="display:none;">
         <div class="card" style="width: 400px; text-align: center;">
             <i data-lucide="lock" style="margin-bottom: 16px; color: var(--gold);"></i>
-            <h2 style="margin-bottom: 8px;">Acceso restringido</h2>
-            <p style="color: var(--gray); margin-bottom: 24px;">Introduce tu clave de administrador para continuar.</p>
-            <input type="password" id="wall-key" class="input" style="text-align: center; margin-bottom: 16px;" placeholder="Admin Key">
+            <h2 style="margin-bottom: 8px;">Configuración Protegida</h2>
+            <p style="color: var(--gray); margin-bottom: 24px;">Introduce tu clave para entrar a esta sección.</p>
+            <input type="password" id="wall-key-input" class="input" style="text-align: center; margin-bottom: 16px;" placeholder="Admin Key">
             <button class="btn btn-primary" style="width: 100%;" onclick="tryAuth()">Entrar</button>
         </div>
     </div>
 
-    <div class="sidebar">
-        <div style="font-weight: 600; font-size: 18px; margin-bottom: 32px; display: flex; align-items: center; gap: 8px;">
-            <div style="width: 24px; height: 24px; background: var(--gold); border-radius: 4px;"></div>
-            SeCasan
+    <nav class="navbar">
+        <div style="font-weight: 600; font-size: 18px; display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="showTab('create')">
+            <div style="width: 20px; height: 20px; background: var(--gold); border-radius: 4px;"></div>
+            SeCasan.
         </div>
-        
-        <div class="nav-link active" id="nav-create" onclick="showTab('create')"><i data-lucide="plus-circle"></i> Nueva boda</div>
-        <div class="nav-link" id="nav-library" onclick="showTab('library')"><i data-lucide="image"></i> Multimedia</div>
-        <div class="nav-link" id="nav-settings" onclick="showTab('settings')"><i data-lucide="settings"></i> Configuración</div>
-        
-        <div style="margin-top: auto;">
-            <a href="/" class="nav-link" style="opacity: 0.5;"><i data-lucide="external-link"></i> Ir a la web</a>
+        <div class="nav-actions">
+            <div class="nav-btn active" id="nav-create" onclick="showTab('create')"><i data-lucide="plus"></i> Crear Invitación</div>
+            <div class="nav-btn" id="nav-library" onclick="showTab('library')"><i data-lucide="image"></i> Multimedia</div>
+            <div class="nav-btn" id="nav-settings" onclick="authTab('settings')"><i data-lucide="settings"></i> Ajustes</div>
         </div>
-    </div>
+    </nav>
 
-    <div class="main">
-        <div id="tab-create">
-            <div class="form-section">
+    <div class="main-container">
+        <!-- TAB: CREATE -->
+        <div id="tab-create" class="tool-width">
+            <div style="margin-bottom: 48px;">
                 <span class="label">Paso 1</span>
-                <h2>Selecciona un tema</h2>
+                <h2>Selecciona la estética</h2>
                 <div id="themes-list" class="theme-grid"></div>
             </div>
 
-            <div class="form-section">
+            <div style="margin-bottom: 48px;">
                 <span class="label">Paso 2</span>
                 <h2>Información de la boda</h2>
-                <p style="color: var(--gray); margin-bottom: 16px;">Describe los detalles (nombres, lugar, fecha, estilo).</p>
-                <textarea id="ai-prompt" class="input" style="min-height: 120px;" placeholder="Ej: Adriana y Luis, elegante atardecer frente al mar..."></textarea>
-                <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px;">
-                    <button class="btn btn-primary" id="gen-btn" onclick="generateWedding()">Generar con IA</button>
-                    <span style="font-size: 11px; color: var(--gray); max-width: 300px;">Nota: Si no has configurado llaves, se usará una demo funcional de alta calidad.</span>
+                <p style="color: var(--gray); margin-bottom: 16px; font-size: 14px;">Define los nombres, lugar y ambiente que deseas proyectar.</p>
+                <textarea id="ai-prompt" class="input" style="min-height: 140px; margin-bottom: 20px;" placeholder="Ej: Adriana y Luis, elegante atardecer frente al mar..."></textarea>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <button class="btn btn-primary" id="gen-btn" onclick="generateWedding()">Generar invitación ✨</button>
+                    <span style="font-size: 11px; color: var(--gray); max-width: 300px;">Genera contenido táctico para tu demo de inmediato.</span>
                 </div>
             </div>
 
-            <div id="ai-result" class="form-section" style="display: none;">
+            <div id="ai-result" style="display: none; margin-bottom: 48px;">
                 <span class="label">Paso 3</span>
-                <h2>Revisión de datos</h2>
+                <h2>Verificar & Publicar</h2>
                 <div id="json-view" class="preview-json"></div>
                 <div style="display: flex; gap: 12px; margin-top: 24px;">
-                    <button class="btn btn-primary" onclick="saveWedding()">Publicar invitación</button>
-                    <button class="btn" onclick="document.getElementById('ai-result').style.display='none'">Descartar</button>
+                    <button class="btn btn-primary" onclick="saveWedding()">Publicar en la nube 🚀</button>
+                    <button class="btn" onclick="document.getElementById('ai-result').style.display='none'">Cancelar</button>
                 </div>
             </div>
         </div>
 
-        <div id="tab-library" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
-                <div>
-                    <span class="label">Activos</span>
-                    <h2>Biblioteca multimedia</h2>
-                </div>
-                <button class="btn btn-primary" onclick="document.getElementById('upload-dialog').style.display='flex'">Añadir archivo</button>
+        <!-- TAB: LIBRARY -->
+        <div id="tab-library" class="tool-width" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <h2>Biblioteca Multimedia</h2>
+                <button class="btn btn-primary" onclick="document.getElementById('upload-dialog').style.display='flex'">Subir archivo</button>
             </div>
-            
-            <div id="assets-grid" class="theme-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
+            <div id="assets-grid" class="theme-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));"></div>
         </div>
 
-        <div id="tab-settings" style="display: none;">
-            <div class="form-section">
-                <span class="label">Administración</span>
-                <h2>Configuración</h2>
-                <p style="color: var(--gray); margin-bottom: 24px; font-size: 13px;">Las llaves permiten que la IA redacte el contenido automáticamente. Puedes probar el sistema sin ellas usando el contenido predefinido.</p>
-                <div style="margin-top: 24px;">
-                    <div style="margin-bottom: 20px;">
-                        <label class="label">Clave de Acceso 1</label>
-                        <input type="password" id="set-google-key" class="input" placeholder="••••••••">
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <label class="label">Clave de Acceso 2</label>
-                        <input type="password" id="set-anthropic-key" class="input" placeholder="••••••••">
-                    </div>
-                    <div style="margin-bottom: 24px;">
-                        <label class="label">Motor Predeterminado</label>
-                        <select id="set-ai-provider" class="input" style="appearance: none;">
-                            <option value="google">Proveedor 1</option>
-                            <option value="anthropic">Proveedor 2</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary" onclick="saveSettings()">Guardar ajustes</button>
+        <!-- TAB: SETTINGS -->
+        <div id="tab-settings" class="tool-width" style="display: none;">
+            <h2>Configuración del Motor</h2>
+            <div style="margin-top: 32px; max-width: 500px;">
+                <div style="margin-bottom: 24px;">
+                    <label class="label">API Key Principal</label>
+                    <input type="password" id="set-google-key" class="input" placeholder="••••••••">
                 </div>
+                <label class="label">Proveedor Activo</label>
+                <select id="set-ai-provider" class="input" style="margin-bottom: 32px;">
+                    <option value="google">Proveedor Estándar</option>
+                    <option value="anthropic">Proveedor Secundario</option>
+                </select>
+                <button class="btn btn-primary" onclick="saveSettings()">Guardar Configuración</button>
             </div>
         </div>
     </div>
@@ -135,15 +132,9 @@
     <!-- Modals -->
     <div id="upload-dialog" class="restricted-overlay" style="display: none;">
         <div class="card" style="width: 460px;">
-            <h2 style="margin-bottom: 20px;">Subir archivo</h2>
-            <div style="margin-bottom: 16px;">
-                <label class="label">Archivo</label>
-                <input type="file" id="asset-file" class="input">
-            </div>
-            <div style="margin-bottom: 24px;">
-                <label class="label">Nombre de referencia</label>
-                <input type="text" id="asset-name" class="input" placeholder="Ej: Foto de portada">
-            </div>
+            <h2 style="margin-bottom: 20px;">Subir Recurso</h2>
+            <input type="file" id="asset-file" class="input" style="margin-bottom: 16px;">
+            <input type="text" id="asset-name" class="input" style="margin-bottom: 24px;" placeholder="Nombre del recurso">
             <div style="display: flex; gap: 12px;">
                 <button class="btn btn-primary" onclick="handleUpload()">Sincronizar</button>
                 <button class="btn" onclick="document.getElementById('upload-dialog').style.display='none'">Cancelar</button>
@@ -153,22 +144,37 @@
 
     <script>
         lucide.createIcons();
-        const adminKey = new URLSearchParams(window.location.search).get('key');
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentKey = urlParams.get('key') || '';
         let selectedTheme = 'roses-premium';
         let generatedContent = null;
 
-        if (!adminKey) document.getElementById('auth-wall').style.display = 'flex';
-        else initDashboard();
+        initDashboard();
 
         function tryAuth() {
-            const key = document.getElementById('wall-key').value;
-            if (key) window.location.href = `?key=${key}`;
+            const key = document.getElementById('wall-key-input').value;
+            if (key) {
+                currentKey = key;
+                document.getElementById('auth-wall').style.display = 'none';
+                showTab('settings');
+            }
+        }
+
+        function authTab(tab) {
+            if (!currentKey) {
+                document.getElementById('auth-wall').style.display = 'flex';
+            } else {
+                showTab(tab);
+            }
         }
 
         function showTab(tab) {
             ['create', 'library', 'settings'].forEach(t => {
-                document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
-                document.getElementById(`nav-${t}`).classList.toggle('active', t === tab);
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.style.display = (t === tab ? 'block' : 'none');
+                
+                const btn = document.getElementById(`nav-${t}`);
+                if (btn) btn.classList.toggle('active', t === tab);
             });
         }
 
@@ -195,34 +201,14 @@
             selectedTheme = id;
         }
 
-        async function loadAssets() {
-            try {
-                const res = await fetch(`/api/assets?key=${adminKey}`);
-                const assets = await res.json();
-                document.getElementById('assets-grid').innerHTML = assets.map(a => `
-                    <div class="theme-item" onclick="copyPath('${a.path}')">
-                        ${a.type === 'video' ? '<div style="aspect-ratio:16/9; background:#111; display:flex; align-items:center; justify-content:center; border-radius:4px;"><i data-lucide="video" style="width:18px;"></i></div>' : `<img src="${a.path}">`}
-                        <div style="font-size: 11px; color: var(--gray); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${a.name}</div>
-                    </div>
-                `).join('');
-                lucide.createIcons();
-            } catch(e) {}
-        }
-
-        function copyPath(path) {
-            navigator.clipboard.writeText(path);
-            alert("Ruta copiada");
-        }
-
         async function generateWedding() {
             const prompt = document.getElementById('ai-prompt').value;
-            if(!prompt) return;
+            if(!prompt) return alert("Escribe tu visión de boda.");
             const btn = document.getElementById('gen-btn');
-            btn.disabled = true;
-            btn.innerText = "Procesando...";
+            btn.disabled = true; btn.innerText = "Generando...";
             
             try {
-                const res = await fetch(`/api/ai/generate?key=${adminKey}`, {
+                const res = await fetch(`/api/ai/generate?key=${currentKey}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ prompt })
@@ -231,58 +217,30 @@
                 generatedContent = data;
                 document.getElementById('json-view').innerText = JSON.stringify(data, null, 2);
                 document.getElementById('ai-result').style.display = 'block';
-            } catch(e) { alert("Error al conectar"); }
-            btn.disabled = false;
-            btn.innerText = "Generar contenido";
+                document.getElementById('ai-result').scrollIntoView({ behavior: 'smooth' });
+            } catch(e) { alert("Error"); }
+            btn.disabled = false; btn.innerText = "Generar invitación ✨";
         }
 
-        async function loadSettings() {
-            const res = await fetch(`/api/settings?key=${adminKey}`);
-            const data = await res.json();
-            if(data.google_key) document.getElementById('set-google-key').value = data.google_key;
-            if(data.anthropic_key) document.getElementById('set-anthropic-key').value = data.anthropic_key;
-            if(data.ai_provider) document.getElementById('set-ai-provider').value = data.ai_provider;
-        }
-
-        async function saveSettings() {
-            await fetch(`/api/settings?key=${adminKey}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    google_key: document.getElementById('set-google-key').value,
-                    anthropic_key: document.getElementById('set-anthropic-key').value,
-                    ai_provider: document.getElementById('set-ai-provider').value
-                })
-            });
-            alert("Ajustes guardados correctamente");
-        }
-        
         async function saveWedding() {
-            const slug = prompt("URL personalizada (ej: marta-y-pedro):")?.toLowerCase().trim();
+            const slug = prompt("Nombre de la URL (ej: marta-y-pedro):")?.toLowerCase().trim();
             if(!slug) return;
-            const res = await fetch(`/api/wedding/create?key=${adminKey}`, {
+            const res = await fetch(`/api/wedding/create?key=${currentKey}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ slug, theme_id: selectedTheme, content: generatedContent })
             });
             if(res.ok) window.location.href = `/v/${slug}`;
+            else alert("Error al guardar.");
         }
 
-        async function handleUpload() {
-            const file = document.getElementById('asset-file').files[0];
-            const name = document.getElementById('asset-name').value;
-            if(!file) return;
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('name', name);
-
-            const res = await fetch(`/api/upload?key=${adminKey}`, { method: 'POST', body: formData });
-            if(res.ok) { 
-                document.getElementById('upload-dialog').style.display='none';
-                loadAssets(); 
-            }
-        }
+        // ... helpers: loadAssets, loadSettings, saveSettings, handleUpload ...
+        // (Mantengo las funciones existentes de forma compacta)
+        async function loadAssets() { try { const res = await fetch(`/api/assets?key=${currentKey}`); const assets = await res.json(); document.getElementById('assets-grid').innerHTML = assets.map(a => `<div class="theme-item" onclick="copyPath('${a.path}')">${a.type === 'video' ? '<div style="aspect-ratio:16/9; background:#111; display:flex; align-items:center; justify-content:center; border-radius:4px;"><i data-lucide="video" style="width:18px;"></i></div>' : `<img src="${a.path}">`}<div style="font-size: 11px; color: var(--gray); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${a.name}</div></div>`).join(''); lucide.createIcons(); } catch(e) {} }
+        function copyPath(path) { navigator.clipboard.writeText(path); alert("Copiado"); }
+        async function loadSettings() { try { const res = await fetch(`/api/settings?key=${currentKey}`); const data = await res.json(); if(data.google_key) document.getElementById('set-google-key').value = data.google_key; if(data.ai_provider) document.getElementById('set-ai-provider').value = data.ai_provider; } catch(e) {} }
+        async function saveSettings() { await fetch(`/api/settings?key=${currentKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ google_key: document.getElementById('set-google-key').value, ai_provider: document.getElementById('set-ai-provider').value }) }); alert("Guardado"); }
+        async function handleUpload() { const file = document.getElementById('asset-file').files[0]; const name = document.getElementById('asset-name').value; if(!file) return; const formData = new FormData(); formData.append('file', file); formData.append('name', name); const res = await fetch(`/api/upload?key=${currentKey}`, { method: 'POST', body: formData }); if(res.ok) { document.getElementById('upload-dialog').style.display='none'; loadAssets(); } }
     </script>
 </body>
 </html>
