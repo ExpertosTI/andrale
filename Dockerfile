@@ -1,17 +1,10 @@
-FROM node:20-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+# Copy static assets to nginx html directory
+COPY . /usr/share/nginx/html/
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install --production
+# Expose port 80
+EXPOSE 80
 
-# Copy application code
-COPY . .
-
-# Ensure data directory exists for SQLite
-RUN mkdir -p data && chmod 777 data
-
-EXPOSE 3000
-
-CMD ["node", "server.js"]
+# The default nginx command will start the server
+CMD ["nginx", "-g", "daemon off;"]

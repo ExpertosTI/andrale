@@ -3,231 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Andreína & Alejandro - Invitación de Boda</title>
-    
+    <title>Boda de Andreína & Alejandro - 16 Mayo 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Alex+Brush&family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.525.0"></script>
     <link rel="stylesheet" href="style.css">
-    
-    <script src="https://unpkg.com/lucide@latest" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
-    <script src="script.js" defer></script>
 </head>
-<body>
-    <!-- Loader -->
-    <div class="loader-overlay" id="loader">
-        <div class="loader-lettering" id="loader-text">A & A</div>
-        <div class="loader-progress">
-            <div class="loader-bar" id="loader-bar"></div>
+<body class="is-scrolling">
+    <!-- Preloader -->
+    <div id="preloader" class="loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#111; z-index:9999;">
+        <img src="assets/Lettering.png" alt="Andreina & Alejandro" style="width:85vw; max-width:400px; filter:drop-shadow(0 2px 10px rgba(255,255,255,0.4)); animation: fadeInPulse 3s infinite alternate; margin-bottom: 20px;">
+    </div>
+
+    <div class="fluid-effect" aria-hidden="true">
+        <div class="fluid"></div>
+        <div class="fluid"></div>
+        <div class="fluid"></div>
+    </div>
+
+    <!-- Scroll Hint Overlay -->
+    <div id="initial-scroll-prompt" class="entrance-overlay" style="background: transparent; z-index: 10; justify-content: flex-end; padding-bottom: 50px;">
+        <div class="entrance-info">
+            <div class="entrance-hint pulse-anim" style="opacity: 0.9;">
+                <i data-lucide="chevrons-up" style="width: 44px; height: 44px; color: var(--accent-teal); margin-bottom: 15px;"></i>
+                <p style="letter-spacing: 4px; font-size: 0.8rem; font-family: var(--font-display);">DESLIZA HACIA ARRIBA</p>
+            </div>
         </div>
     </div>
-    
-    <!-- Petals Canvas -->
-    <canvas id="petals-canvas"></canvas>
-    
-    <!-- App Container -->
-    <div class="app-container">
-        
-        <!-- Section 1: Hero with Photo Transition -->
-        <section class="section hero-section" id="hero">
-            <div class="photo-container">
-                <img src="assets/closeup-of-a-bride-holding-a-bouquet-2026-01-07-07-21-30-utc.jpg" alt="Detalle" class="hero-photo hero-photo-1" id="hero-photo-1">
-                <img src="assets/couple-holding-hands-wedding.jpg" alt="Pareja" class="hero-photo hero-photo-2" id="hero-photo-2">
-                <div class="hero-overlay"></div>
-            </div>
-            
-            <div class="lettering-container">
-                <div class="lettering-main" id="lettering-main">
-                    <img src="assets/Lettering.png" alt="Andreína & Alejandro">
+
+    <!-- Universal Background Video -->
+    <video id="motion-scrub-video" src="assets/rosas-fondo.mp4" muted playsinline class="bg-video motion-scrub" preload="auto"></video>
+    <div class="video-overlay-mask"></div>
+
+    <!-- Gold Dust Canvas -->
+    <canvas id="canvas"></canvas>
+    <div class="scroll-progress" id="scroll-progress"></div>
+
+    <!-- Hero Overlay -->
+    <div id="hero-overlay" class="hero-content fixed-hero">
+        <!-- Dual logo stack: colored (base) + white (top, fades first) -->
+        <div class="logo-stack">
+            <img src="assets/Lettering.png" id="hero-logo-color" alt="Andreina & Alejandro">
+            <img src="assets/Lettering.png" id="hero-logo-img"   alt="Andreina & Alejandro">
+        </div>
+        <div id="hero-separator" class="hero-separator"></div>
+        <p class="hero-quote" id="data-hero-verse" data-immersive-text="fixed"></p>
+        <p class="hero-quote-book" id="data-hero-verse-book"></p>
+        <div class="hero-date" id="data-hero-date"></div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" style="position: relative; z-index: 10;">
+        <!-- Pacer: Compacted for immediate dynamic response -->
+        <div id="intro-pacer" style="height: 110vh; width: 100%; pointer-events: none;"></div>
+
+        <!-- Reception (Data sourced from data.js) -->
+        <section class="section details" id="details">
+            <div class="glass-card saga-card">
+                <div class="icon-travel-wrap">
+                    <i data-lucide="car" class="card-icon auto-travel"></i>
+                    <div class="path-dash"></div>
+                    <i data-lucide="map-pin" class="card-icon destination-pin"></i>
                 </div>
-            </div>
-            
-            <div class="hero-details">
-                <p class="hero-verse" id="hero-verse">"Mejores son dos que uno... Porque si cayeren, el uno levantará a su compañero."</p>
-                <p class="hero-date" id="hero-date">Sábado, 16 de mayo 2026</p>
-            </div>
-            
-            <div class="scroll-indicator">
-                <span>Desliza</span>
-                <i data-lucide="chevron-down"></i>
-            </div>
-        </section>
-        
-        <!-- Section 2: Info with Progressive Video Background -->
-        <section class="section info-section" id="info">
-            <div class="video-background" id="video-bg">
-                <!-- Data-src-hq trigger progressive loading swap -->
-                <video muted playsinline id="bg-video" loop data-src-hq="assets/rosas-fondo.mp4">
-                    <source src="assets/the-bride-scrub.mp4" type="video/mp4">
-                </video>
-            </div>
-            
-            <div class="info-content">
-                <!-- Countdown -->
-                <div class="card countdown-card">
-                    <h3>Nos casamos en</h3>
-                    <div class="countdown-display">
-                        <div class="countdown-item">
-                            <div class="countdown-number" id="cd-days">00</div>
-                            <div class="countdown-label">Días</div>
-                        </div>
-                        <div class="countdown-item">
-                            <div class="countdown-number" id="cd-hours">00</div>
-                            <div class="countdown-label">Hrs</div>
-                        </div>
-                        <div class="countdown-item">
-                            <div class="countdown-number" id="cd-mins">00</div>
-                            <div class="countdown-label">Min</div>
-                        </div>
-                        <div class="countdown-item">
-                            <div class="countdown-number" id="cd-secs">00</div>
-                            <div class="countdown-label">Seg</div>
-                        </div>
+                <h2 data-immersive-text="section" id="data-reception-title"></h2>
+                <div class="detail-grid fade-in-text">
+                    <div class="grid-item">
+                        <span class="label">LUGAR</span>
+                        <p class="value" id="data-reception-place"></p>
+                    </div>
+                    <div class="grid-item">
+                        <span class="label">HORA</span>
+                        <p class="value" id="data-reception-time"></p>
                     </div>
                 </div>
-                
-                <!-- Ceremony -->
-                <div class="card ceremony-card">
-                    <div class="section-header">
-                        <div class="section-label">Detalles de la</div>
-                        <h2 class="section-title">Ceremonia</h2>
-                    </div>
-                    
-                    <h3>Boda Civil</h3>
-                    
-                    <div class="ceremony-detail">
-                        <i data-lucide="calendar"></i>
-                        <span>Sábado, 16 de mayo 2026 - 4:00 PM</span>
-                    </div>
-                    
-                    <div class="ceremony-detail">
-                        <i data-lucide="map-pin"></i>
-                        <span>Plaza Roja, Santo Domingo Este</span>
-                    </div>
-                    
-                    <p class="location-address">
-                        Autopista de San Isidro<br>
-                        Plaza Roja Segundo Nivel<br>
-                        Santo Domingo Este
-                    </p>
-                    
-                    <a href="https://www.google.com/maps/search/?api=1&query=18.496412,-69.797211" class="map-btn" target="_blank">
-                        <i data-lucide="navigation"></i> Ver Ubicación
-                    </a>
-                </div>
-                
-                <!-- Dress Code -->
-                <div class="card dress-code-card">
-                    <div class="section-header">
-                        <div class="section-label">Norma de</div>
-                        <h2 class="section-title">Vestimenta</h2>
-                    </div>
-                    <div class="dress-icons">
-                        <div class="dress-icon">
-                            <i data-lucide="shirt"></i>
-                            <span>Caballeros</span>
-                        </div>
-                        <div class="dress-icon">
-                            <i data-lucide="pocket"></i>
-                            <span>Damas</span>
-                        </div>
-                    </div>
-                    <p class="dress-style">Formal</p>
+                <p class="address fade-in-text" id="data-reception-address"></p>
+                <div class="map-links fade-in-text">
+                    <a href="javascript:void(0)" onclick="window.open(weddingData.reception.map_google, '_blank')" class="btn-map" title="Google Maps"><i data-lucide="map"></i></a>
+                    <a href="javascript:void(0)" onclick="window.open(weddingData.reception.map_waze, '_blank')" class="btn-map" title="Waze"><i data-lucide="navigation"></i></a>
+                    <a href="javascript:void(0)" onclick="window.location.href = weddingData.reception.map_apple" class="btn-map" title="Apple Maps"><i data-lucide="map-pin"></i></a>
                 </div>
             </div>
         </section>
-        
-        <!-- Section 3: Gifts & Confirmation -->
-        <section class="section gifts-rsvp-section" id="rsvp">
-            <div class="info-content">
-                <div class="card">
-                    <div class="section-header">
-                        <div class="section-label">Muestra de</div>
-                        <h2 class="section-title">Cariño</h2>
-                    </div>
-                    <p style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 25px; text-align: center;">
-                        Su presencia es lo más importante. Si desea hacernos un obsequio, puede hacerlo vía transferencia:
-                    </p>
-                    <div class="accounts-list">
-                        <div class="account-item" onclick="copyToClipboard('815442256')">
-                            <div class="account-info">
-                                <span class="account-bank">Banco Popular</span>
-                                <span class="account-number">815-44225-6</span>
-                                <span class="account-holder">Andreína Cuevas (Ahorros)</span>
-                            </div>
-                            <i data-lucide="copy" class="copy-icon"></i>
-                        </div>
-                        <div class="account-item" onclick="copyToClipboard('9608198982')">
-                            <div class="account-info">
-                                <span class="account-bank">Banreservas</span>
-                                <span class="account-number">960-819-898-2</span>
-                                <span class="account-holder">Alejandro Paula (Ahorros)</span>
-                            </div>
-                            <i data-lucide="copy" class="copy-icon"></i>
-                        </div>
-                    </div>
+
+        <!-- Dress Code -->
+        <section class="section rules" id="rules">
+            <div class="glass-card saga-card">
+                <div class="shopping-icons">
+                    <i data-lucide="shirt" class="card-icon icon-shop-1"></i>
+                    <i data-lucide="gem" class="card-icon icon-shop-2"></i>
+                    <i data-lucide="watch" class="card-icon icon-shop-3"></i>
+                </div>
+                <h2 data-immersive-text="section" id="data-dress-title"></h2>
+                <p class="style-title" data-immersive-text="section" id="data-dress-style"></p>
+                <div class="style-warning fade-in-text" id="data-dress-warning"></div>
+                <div class="divider fade-in-text"></div>
+                <div class="no-kids fade-in-text">
+                    <i data-lucide="baby" class="icon-forbidden"></i>
+                    <p id="data-dress-kids"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gifts -->
+        <section class="section gifts" id="gifts">
+            <div class="glass-card saga-card">
+                <div class="gifts-pile">
+                    <i data-lucide="gift" class="card-icon gift-back-left"></i>
+                    <i data-lucide="gift" class="card-icon gift-back-right"></i>
+                    <i data-lucide="gift" class="card-icon gift-front"></i>
+                </div>
+                <h2 data-immersive-text="section" id="data-gifts-title"></h2>
+                <p class="gift-intro fade-in-text" id="data-gifts-message"></p>
+                
+                <div class="account-list fade-in-text" id="data-gifts-accounts">
+                    <!-- Populated by data.js -->
                 </div>
 
-                <div class="rsvp-cta">
-                    <p class="rsvp-cta-title">¿Nos acompañas?</p>
-                    <button class="rsvp-btn-main" onclick="openModal()">
-                        <i data-lucide="check-circle-2"></i> Confirmar Asistencia
+                <div class="holder-info fade-in-text" id="data-gifts-holder"></div>
+            </div>
+        </section>
+
+        <!-- Final Section: Closing, Countdown & RSVP -->
+        <section class="section final-wrap" id="closing">
+            <div class="glass-card saga-card">
+                <p class="closing-message-text fade-in-text" id="data-closing-message"></p>
+                
+                <div class="countdown-card fade-in-text" id="countdown">
+                    <div class="time-block"><span id="cd-days" class="time-num">00</span><span class="time-label">DÍAS</span></div>
+                    <div class="time-block"><span id="cd-hours" class="time-num">00</span><span class="time-label">HORAS</span></div>
+                    <div class="time-block"><span id="cd-mins" class="time-num">00</span><span class="time-label">MINUTOS</span></div>
+                    <div class="time-block"><span id="cd-secs" class="time-num">00</span><span class="time-label">SEGUNDOS</span></div>
+                </div>
+
+                <div class="rsvp-final-wrap fade-in-text" style="margin-top: 40px;">
+                    <button class="rsvp-submit-btn" id="rsvp-open" onclick="openRsvpModal()" style="max-width: 300px; margin: 0 auto;">
+                        <i data-lucide="heart" style="width:18px; height:18px; margin-right:8px;"></i>
+                        CONFIRMAR ASISTENCIA
                     </button>
-                    <p style="font-size: 0.75rem; margin-top: 20px; color: var(--color-text-light); text-align: center;">
-                        Favor confirmar antes del 1 de Mayo 2026
-                    </p>
                 </div>
             </div>
         </section>
-    </div>
+
+    </main>
 
     <!-- RSVP Modal -->
-    <div class="modal" id="rsvp-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Confirmar</h2>
-                <button class="modal-close" onclick="closeModal()">
-                    <i data-lucide="x"></i>
+    <div id="rsvp-modal" class="rsvp-modal-overlay">
+        <div class="rsvp-modal-card glass-card">
+            <button class="rsvp-close" onclick="closeRsvpModal()">&times;</button>
+            <h3 class="rsvp-modal-title">Confirmar Asistencia</h3>
+            <div id="rsvp-form-wrap">
+                <input type="text" id="rsvp-name" class="rsvp-input" placeholder="Tu nombre completo" required>
+                <input type="number" id="rsvp-guests" class="rsvp-input" placeholder="Número de acompañantes" min="1" max="10" value="1">
+                <textarea id="rsvp-message" class="rsvp-input rsvp-textarea" placeholder="Mensaje para los novios (opcional)" rows="3"></textarea>
+                <button class="rsvp-submit-btn" id="rsvp-submit" onclick="submitRsvp()">
+                    <i data-lucide="send" style="width:18px; height:18px; margin-right:8px;"></i>
+                    Confirmar
                 </button>
             </div>
-            <form id="rsvp-form">
-                <div class="form-group">
-                    <label for="rsvp-name">Nombre Completo</label>
-                    <input type="text" id="rsvp-name" placeholder="Ej. Juan Pérez" required>
-                </div>
-                <div class="form-group">
-                    <label for="rsvp-guests">Cantidad de Personas</label>
-                    <select id="rsvp-guests">
-                        <option value="1">1 Persona</option>
-                        <option value="2">2 Personas</option>
-                        <option value="3">3 Personas</option>
-                        <option value="4">4 Personas</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="rsvp-phone">Teléfono / WhatsApp</label>
-                    <input type="tel" id="rsvp-phone" placeholder="809-000-0000" required>
-                </div>
-                <div class="form-group">
-                    <label for="rsvp-wishes">Mensaje para los novios</label>
-                    <textarea id="rsvp-wishes" placeholder="Opcional..."></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Enviar Confirmación</button>
-            </form>
+            <div id="rsvp-success" class="rsvp-success" style="display:none;">
+                <i data-lucide="check-circle" style="width:60px; height:60px; color:var(--accent-gold); margin-bottom:20px;"></i>
+                <h4>¡Gracias!</h4>
+                <p>Los esperamos con mucho amor.</p>
+            </div>
         </div>
     </div>
 
-    <!-- Quick Contact -->
-    <div class="quick-contact">
-        <button class="quick-contact-btn" onclick="openWhatsApp('Andreína', '8498154422')" title="Contactar a Andreína">
-            <i data-lucide="heart"></i>
-        </button>
-    </div>
+    <div id="toast" class="toast">¡Copiado!</div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast">¡Mensaje enviado!</div>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
+
