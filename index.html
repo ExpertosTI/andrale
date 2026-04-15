@@ -8,11 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.525.0"></script>
+    
     <style>
         :root {
             --gold: #D4AF37;
-            --champagne: #F7E7CE;
             --dark: #0A0A0A;
             --font-serif: 'Cormorant Garamond', serif;
             --font-sans: 'Montserrat', sans-serif;
@@ -21,57 +24,47 @@
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; background: var(--dark); color: #fff; font-family: var(--font-sans); overflow-x: hidden; }
 
-        /* Immersive Background */
-        .bg-container {
-            position: fixed; inset: 0; z-index: -1;
-            overflow: hidden;
-        }
-        .bg-video {
-            width: 100vw; height: 100vh; object-fit: cover;
-            filter: brightness(0.4) saturate(0.8);
-        }
-        .bg-overlay {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
-        }
+        /* Background Video */
+        .bg-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+        .bg-video { width: 100vw; height: 100vh; object-fit: cover; filter: brightness(0.35); }
+        .bg-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.85) 100%); }
 
-        /* Elements */
+        /* Premium Components */
         .premium-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 60px 40px;
-            border-radius: 4px;
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            padding: 80px 40px;
+            border-radius: 2px;
             max-width: 600px;
-            margin: 40px auto;
+            margin: 60px auto;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
         }
 
         .serif { font-family: var(--font-serif); }
-        .gold-glow { text-shadow: 0 0 20px rgba(212,175,55,0.4); color: var(--gold); }
+        .gold-glow { text-shadow: 0 0 30px rgba(212,175,55,0.3); color: var(--gold); }
 
-        h1 { font-size: 3.5rem; font-weight: 400; margin-bottom: 20px; line-height: 1; }
-        .quote { font-style: italic; font-size: 1.4rem; opacity: 0.8; margin-bottom: 40px; }
-        .date { letter-spacing: 5px; font-size: 0.9rem; text-transform: uppercase; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); display: inline-block; padding: 10px 20px; margin: 30px 0; }
+        h1 { font-size: 4rem; font-weight: 300; margin-bottom: 20px; line-height: 0.9; }
+        .quote { font-style: italic; font-size: 1.6rem; opacity: 0.7; margin-bottom: 40px; }
+        .date { letter-spacing: 6px; font-size: 0.8rem; text-transform: uppercase; border-top: 1px solid rgba(212,175,55,0.4); border-bottom: 1px solid rgba(212,175,55,0.4); display: inline-block; padding: 12px 30px; margin: 40px 0; }
 
-        .section-title { font-size: 2rem; margin-bottom: 30px; letter-spacing: 2px; }
-        .detail-row { margin-bottom: 20px; }
-        .label { color: var(--gold); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .value { font-family: var(--font-serif); font-size: 1.6rem; }
+        .section-title { font-size: 2.2rem; margin-bottom: 40px; letter-spacing: 3px; }
+        .detail-row { margin-bottom: 30px; }
+        .label { color: var(--gold); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; display: block; margin-bottom: 8px; }
+        .value { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 400; }
 
         .btn-rsvp {
             background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 15px 40px; font-size: 0.8rem; letter-spacing: 3px; cursor: pointer;
-            transition: 0.3s; margin-top: 40px; text-transform: uppercase;
+            padding: 18px 50px; font-size: 0.8rem; letter-spacing: 4px; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); margin-top: 60px; text-transform: uppercase;
         }
-        .btn-rsvp:hover { background: var(--gold); color: #000; }
+        .btn-rsvp:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px rgba(212,175,55,0.4); }
 
-        /* Animation */
-        .reveal { opacity: 0; transform: translateY(30px); transition: 1s ease-out; }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        #hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        #hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
+        
+        /* Decorative Elements */
+        .divider-line { width: 1px; height: 100px; background: linear-gradient(to bottom, var(--gold), transparent); margin: 40px auto; }
     </style>
 </head>
 <body>
@@ -84,66 +77,69 @@
 
     <!-- Hero Section -->
     <section id="hero">
-        <div class="reveal">
-            <h1 class="serif gold-glow" id="data-wedding-title">Cargando...</h1>
+        <div data-aos="fade-up" data-aos-duration="2000">
+            <h1 class="serif gold-glow" id="data-wedding-title">...</h1>
             <p class="quote serif" id="data-hero-quote"></p>
             <div class="date" id="data-hero-date"></div>
-            <p class="serif" style="font-size:1.1rem; opacity:0.7;" id="data-hero-verses"></p>
+            <p class="serif" style="font-size:1.2rem; opacity:0.6; max-width: 500px; margin: 0 auto;" id="data-hero-verses"></p>
         </div>
-    </nav>
+    </section>
 
-    <!-- Main Sections -->
-    <main style="padding-bottom: 100px;">
-        <div class="premium-card reveal">
+    <div class="divider-line" data-aos="fade-down"></div>
+
+    <!-- Main Content -->
+    <main style="padding-bottom: 120px; padding: 0 20px;">
+        <div class="premium-card" data-aos="fade-up">
             <h2 class="section-title serif gold-glow" id="data-reception-title">Evento</h2>
             <div class="detail-row">
                 <span class="label">Ubicación</span>
                 <p class="value" id="data-reception-place"></p>
             </div>
             <div class="detail-row">
-                <span class="label">Hora</span>
+                <span class="label">Horario</span>
                 <p class="value" id="data-reception-time"></p>
             </div>
-            <p style="opacity:0.6; font-size:0.9rem;" id="data-reception-address"></p>
+            <p style="opacity:0.5; font-size:0.9rem; font-style: italic;" id="data-reception-address"></p>
         </div>
 
-        <div class="premium-card reveal">
-            <h2 class="section-title serif gold-glow" id="data-dress-title">Código de Vestimenta</h2>
-            <p class="value serif" id="data-dress-style" style="font-size:2rem;"></p>
-            <p style="opacity:0.7; margin: 20px 0;" id="data-dress-warning"></p>
-            <div style="border-top:1px solid rgba(212,175,55,0.1); padding-top:20px;">
-                <p style="font-size:0.8rem; letter-spacing:1px; color:var(--gold);" id="data-dress-kids"></p>
+        <div class="premium-card" data-aos="fade-up">
+            <h2 class="section-title serif gold-glow" id="data-dress-title">Código de Etiqueta</h2>
+            <p class="value serif" id="data-dress-style" style="font-size:2.4rem;"></p>
+            <p style="opacity:0.6; margin: 25px 0; font-size: 1.1rem;" id="data-dress-warning"></p>
+            <div style="border-top:1px solid rgba(212,175,55,0.1); padding-top:30px; margin-top: 30px;">
+                <p style="font-size:0.8rem; letter-spacing:2px; color:var(--gold);" id="data-dress-kids"></p>
             </div>
         </div>
 
-        <div class="premium-card reveal">
+        <div class="premium-card" data-aos="fade-up">
             <h2 class="section-title serif gold-glow" id="data-gifts-title">Mesa de Regalos</h2>
-            <p style="opacity:0.8; line-height:1.6;" id="data-gifts-message"></p>
-            <div id="data-gifts-accounts" style="margin-top:30px;">
-                <!-- Accounts will be injected here -->
+            <p style="opacity:0.7; line-height:1.8; font-size: 1.1rem;" id="data-gifts-message"></p>
+            <div id="data-gifts-accounts" style="margin-top:40px;">
+                <!-- Accounts injected here -->
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 60px;">
+        <div style="text-align: center; margin-top: 80px;" data-aos="zoom-in">
             <button class="btn-rsvp" onclick="confirmRSVP()">Confirmar Asistencia</button>
         </div>
     </main>
 
-    <footer style="text-align: center; padding: 40px; opacity: 0.3; font-size: 0.7rem; letter-spacing: 2px;">
-        POWERED BY RENACE TECH & SECASAN AI
+    <footer style="text-align: center; padding: 60px; opacity: 0.2; font-size: 0.7rem; letter-spacing: 3px; font-weight: 300;">
+        DESIGNED BY SE CASAN PREMIUM AI
     </footer>
 
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        const slug = window.location.pathname.split('/').pop();
+        const slug = window.location.pathname.split('/').pop().split('?')[0];
         
         async function loadWedding() {
             try {
                 const res = await fetch(`/api/wedding/${slug}`);
-                if (!res.ok) throw new Error('No encotrada');
+                if (!res.ok) throw new Error('Not found');
                 const data = await res.json();
                 const content = JSON.parse(data.content);
 
-                document.title = data.title || 'Nuestra Boda';
+                document.title = `${data.title} | SeCasan`;
                 document.getElementById('data-wedding-title').innerText = data.title;
                 document.getElementById('data-hero-quote').innerText = content.hero.quote;
                 document.getElementById('data-hero-date').innerText = content.hero.date;
@@ -162,36 +158,23 @@
                 document.getElementById('data-gifts-title').innerText = content.gifts.title;
                 document.getElementById('data-gifts-message').innerText = content.gifts.message;
 
-                // Simple account injection
                 const accountsContainer = document.getElementById('data-gifts-accounts');
                 if (content.gifts.accounts) {
                     content.gifts.accounts.forEach(acc => {
                         const div = document.createElement('div');
-                        div.style.marginBottom = '15px';
-                        div.innerHTML = `<span style="display:block; font-size:0.7rem; opacity:0.5;">${acc.bank}</span><span class="serif" style="font-size:1.2rem;">${acc.account}</span>`;
+                        div.style.marginBottom = '20px';
+                        div.innerHTML = `<span style="display:block; font-size:0.75rem; opacity:0.4; letter-spacing:1px;">${acc.bank}</span><span class="serif" style="font-size:1.4rem;">${acc.account}</span>`;
                         accountsContainer.appendChild(div);
                     });
                 }
 
-                initObservers();
+                AOS.init({ once: true, offset: 50 });
             } catch (e) {
-                document.body.innerHTML = '<div style="height:100vh; display:flex; align-items:center; justify-content:center;"><h1>Boda no encontrada</h1></div>';
+                document.body.innerHTML = '<div style="height:100vh; display:flex; align-items:center; justify-content:center; color: var(--gold); font-family:serif;"><h1>Boda no encontrada</h1></div>';
             }
         }
 
-        function initObservers() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) entry.target.classList.add('visible');
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        }
-
-        function confirmRSVP() {
-            alert("Redirigiendo a confirmación...");
-        }
+        function confirmRSVP() { alert("Redirigiendo a RSVP..."); }
 
         loadWedding();
     </script>
