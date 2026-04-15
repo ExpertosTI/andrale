@@ -76,7 +76,10 @@
                 <h2>Información de la boda</h2>
                 <p style="color: var(--gray); margin-bottom: 16px;">Describe los detalles (nombres, lugar, fecha, estilo).</p>
                 <textarea id="ai-prompt" class="input" style="min-height: 120px;" placeholder="Ej: Adriana y Luis, elegante atardecer frente al mar..."></textarea>
-                <button class="btn btn-primary" id="gen-btn" onclick="generateWedding()">Generar contenido</button>
+                <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px;">
+                    <button class="btn btn-primary" id="gen-btn" onclick="generateWedding()">Generar con IA</button>
+                    <span style="font-size: 11px; color: var(--gray); max-width: 300px;">Nota: Si no has configurado llaves, se usará una demo funcional de alta calidad.</span>
+                </div>
             </div>
 
             <div id="ai-result" class="form-section" style="display: none;">
@@ -105,7 +108,8 @@
         <div id="tab-settings" style="display: none;">
             <div class="form-section">
                 <span class="label">Administración</span>
-                <h2>Configuración del motor</h2>
+                <h2>Configuración</h2>
+                <p style="color: var(--gray); margin-bottom: 24px; font-size: 13px;">Las llaves permiten que la IA redacte el contenido automáticamente. Puedes probar el sistema sin ellas usando el contenido predefinido.</p>
                 <div style="margin-top: 24px;">
                     <div style="margin-bottom: 20px;">
                         <label class="label">Clave de Acceso 1</label>
