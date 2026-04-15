@@ -1,0 +1,77 @@
+/* ===================================
+   SECASAN CORE ENGINE — SHARED
+   Contains ONLY layout and structure.
+   =================================== */
+
+:root {
+    --transition-section: 0.8s;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --- Reset & Base --- */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* --- Preloader Structure --- */
+.loading {
+    position: fixed; inset: 0; z-index: 10000;
+    background: var(--bg-primary);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+.loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.logo-loader-wrap { position: relative; width: 85vw; max-width: 400px; margin-bottom: 20px; }
+.logo-loader-bg { width: 100%; height: auto; opacity: 0.2; filter: brightness(0) invert(1); }
+.logo-loader-fill {
+    position: absolute; top: 0; left: 0; width: 100%; height: auto;
+    clip-path: inset(100% 0 0 0); transition: clip-path 0.4s ease;
+}
+
+/* --- Section Engine --- */
+main { position: relative; z-index: 10; }
+.section {
+    position: fixed; top: 50%; left: 50%; width: 100vw; max-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 80px 20px; text-align: center; opacity: 0; pointer-events: none; z-index: 20;
+    will-change: opacity, transform, filter;
+    transform: translate(-50%, -50%) scale(0.85);
+    transition: transform 0.8s var(--ease-out), filter 0.8s var(--ease-out), opacity 0.7s ease-out;
+}
+.section.active { opacity: 1; pointer-events: auto; filter: blur(0px) brightness(1); transform: translate(-50%, -50%) scale(1); }
+
+/* --- Components --- */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-radius: 28px;
+    padding: 40px 32px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.hero-quote { font-family: var(--font-body); font-style: italic; line-height: 1.7; }
+.hero-date { font-family: var(--font-display); letter-spacing: 6px; font-weight: 600; }
+
+.btn-map, .time-block, .account-item {
+    background: var(--glass-bg-light); border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+/* --- Animations --- */
+.fade-in-text {
+    opacity: 0; transform: scale(0.92); filter: blur(8px);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out), filter 0.7s var(--ease-out);
+}
+.section.active .fade-in-text, .fade-in-text.is-visible { opacity: 1; transform: scale(1); filter: blur(0px); }
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+    .section { padding: 40px 16px; }
+    .glass-card { padding: 24px 16px; width: calc(100% - 32px); border-radius: 20px; }
+}

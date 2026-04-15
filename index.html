@@ -8,15 +8,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Alex+Brush&family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.525.0"></script>
-    <link rel="icon" type="image/svg+xml" href="assets/renace.svg">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="/assets/renace.svg">
+    <link rel="stylesheet" href="/templates/shared/engine.css">
+    <link id="secasan-theme-link" rel="stylesheet" href="/templates/roses/theme.css">
 </head>
 <body class="is-scrolling">
     <!-- Preloader -->
     <div id="preloader" class="loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#111; z-index:9999;">
         <div class="logo-loader-wrap">
-            <img src="assets/Lettering.png" class="logo-loader-bg" alt="">
-            <img src="assets/Lettering.png" id="logo-loader-fill" class="logo-loader-fill" alt="Andreina & Alejandro">
+            <img src="/assets/Lettering.png" class="logo-loader-bg" alt="">
+            <img src="/assets/Lettering.png" id="logo-loader-fill" class="logo-loader-fill" alt="Andreina & Alejandro">
         </div>
     </div>
 
@@ -37,7 +38,7 @@
     </div>
 
     <!-- Universal Background Video -->
-    <video id="motion-scrub-video" src="assets/rosas-fondo.mp4" 
+    <video id="motion-scrub-video" src="/assets/rosas-fondo.mp4" 
            muted playsinline webkit-playsinline autoplay disablePictureInPicture 
            class="bg-video motion-scrub" preload="auto"></video>
     <div class="video-overlay-mask"></div>
@@ -50,8 +51,8 @@
     <div id="hero-overlay" class="hero-content fixed-hero">
         <!-- Dual logo stack: colored (base) + white (top, fades first) -->
         <div class="logo-stack">
-            <img src="assets/Lettering.png" id="hero-logo-color" alt="Andreina & Alejandro">
-            <img src="assets/Lettering.png" id="hero-logo-img"   alt="Andreina & Alejandro">
+            <img src="/assets/Lettering.png" id="hero-logo-color" alt="Andreina & Alejandro">
+            <img src="/assets/Lettering.png" id="hero-logo-img"   alt="Andreina & Alejandro">
         </div>
         <div id="hero-separator" class="hero-separator"></div>
         <p class="hero-quote" id="data-hero-verse" data-immersive-text="fixed"></p>
@@ -180,12 +181,28 @@
     <footer class="renace-footer">
         <a href="https://renace.tech" target="_blank" rel="noopener" class="renace-brand">
             <span class="powered-text">Powered by</span>
-            <img src="assets/renace.svg" alt="Renace Tech" class="renace-logo">
+            <img src="/assets/renace.svg" alt="Renace Tech" class="renace-logo">
         </a>
     </footer>
 
-    <script src="data.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // SeCasan Multi-tenant Bootstrapper
+        window.SECASAN_SLUG = window.location.pathname.startsWith('/v/') ? window.location.pathname.split('/v/')[1].split('?')[0] : null;
+        
+        // Helper to load theme link before script.js reaches content
+        async function preBootstrap() {
+            if(!window.SECASAN_SLUG) return;
+            try {
+                const res = await fetch(`/api/wedding/${window.SECASAN_SLUG}`);
+                const data = await res.json();
+                if(data.theme_id) {
+                   document.getElementById('secasan-theme-link').href = `/templates/${data.theme_id.split('-')[0]}/theme.css`;
+                }
+            } catch(e) {}
+        }
+        preBootstrap();
+    </script>
+    <script src="/script.js"></script>
     <script>lucide.createIcons();</script>
 </body>
 </html>

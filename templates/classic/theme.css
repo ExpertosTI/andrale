@@ -1,0 +1,55 @@
+/* ===================================
+   TEMA: CLASSIC SILK (Minimalist)
+   =================================== */
+
+:root {
+    --bg-primary: #fdfbf7;
+    --bg-secondary: #f4ece1;
+    --accent-gold: #b2944b;
+    --accent-gold-light: #d4af37;
+    --accent-teal: #8fa189; /* Olive Green contrast */
+    --text-primary: #2d2d2d;
+    --text-secondary: #5a5a5a;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-bg-light: rgba(255, 255, 255, 0.3);
+    --glass-border: rgba(178, 148, 75, 0.2);
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* Background Effects - Using Silk Static Image */
+body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: -3;
+    background-image: url('/assets/classic_bg.png');
+    background-size: cover;
+    background-position: center;
+    filter: opacity(0.4) saturate(0.5);
+}
+
+.bg-video { display: none; } /* No video for this classic theme */
+
+.fluid-effect { display: none; } /* Keep it clean */
+
+/* Theme Specific Design */
+.glass-card {
+    border-radius: 4px; /* Sharp corners for old money look */
+    border-width: 0.5px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+}
+
+.closing-message-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 7vw, 3rem);
+    color: var(--accent-gold);
+    text-shadow: none;
+}
+
+h2 {
+    font-family: var(--font-display);
+    border-bottom: 1px solid var(--accent-gold);
+    display: inline-block;
+    padding-bottom: 5px;
+}

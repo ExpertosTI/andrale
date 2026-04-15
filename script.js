@@ -1,26 +1,48 @@
-/* ========================================================
-   WEDDING INVITATION — SCRIPT PRINCIPAL
-   Andreína & Alejandro — 16 Mayo 2026
-   ======================================================== */
+// ─── INITIALIZATION (SeCasan Engine) ──────────────────────────────────────
+let weddingData = null;
 
-// ─── CANVAS & PARTICLES ────────────────────────────────────────────────────
-const canvas = document.getElementById('canvas');
-const ctx = canvas ? canvas.getContext('2d') : null;
-const progressBar = document.getElementById('scroll-progress');
-const motionScrubVideo = document.getElementById('motion-scrub-video');
-const heroLogoImg = document.getElementById('hero-logo-img');
-const sections = document.querySelectorAll('.section');
+async function initSeCasan() {
+    // If no slug, we might be in local dev with data.js or a placeholder
+    if (!window.SECASAN_SLUG) {
+        console.warn("SeCasan: No slug detected. Local mode.");
+        if (typeof window.weddingData !== 'undefined') {
+            weddingData = window.weddingData;
+            finalizeInit();
+        }
+        return;
+    }
 
-let particles = [];
-let targetScroll = 0;
-let currentScroll = 0;
-let experienceStarted = true; // immediate
+    try {
+        const response = await fetch(`/api/wedding/${window.SECASAN_SLUG}`);
+        if (!response.ok) throw new Error("Boda no encontrada");
+        const data = await response.json();
+        
+        weddingData = data.content;
+        window.weddingData = weddingData; // Legacy support
+        window.SECASAN_ID = data.id;
 
-// ─── PRELOADER & VIDEO LOADING ─────────────────────────────────────────────
-const preloader = document.getElementById('preloader');
-const logoFill = document.getElementById('logo-loader-fill');
+        finalizeInit();
+    } catch (err) {
+        console.error("SeCasan Load Error:", err);
+        document.body.innerHTML = `<div style="display:flex; height:100vh; align-items:center; justify-content:center; background:#111; color:white; font-family:sans-serif; text-align:center; padding:20px;">
+            <div>
+                <h1 style="color:gold;">Boda no encontrada</h1>
+                <p>El enlace no es válido o la invitación ha caducado.</p>
+                <a href="/" style="color: white; text-decoration: underline;">Volver a SeCasan.app</a>
+            </div>
+        </div>`;
+    }
+}
 
-const VIDEO_SOURCE = 'assets/rosas-fondo.mp4';
+function finalizeInit() {
+    populateSections(); // Must be defined below
+    initVideoLoading();
+    animate();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// Kickstart process
+document.addEventListener('DOMContentLoaded', initSeCasan);
 
 /**
  * Stage 1: Load the correct Roses video.
@@ -41,7 +63,50 @@ function initVideoLoading() {
         }
     }, 100);
 
-    // Initial load
+const canvas = document.getElementById('canvas');
+const ctx = canvas ? canvas.getContext('2d') : null;
+const progressBar = document.getElementById('scroll-progress');
+const motionScrubVideo = document.getElementById('motion-scrub-video');
+const heroLogoImg = document.getElementById('hero-logo-img');
+const sections = document.querySelectorAll('.section');
+const preloader = document.getElementById('preloader');
+const logoFill = document.getElementById('logo-loader-fill');
+
+let particles = [];
+let targetScroll = 0;
+let currentScroll = 0;
+let experienceStarted = true;
+
+const VIDEO_SOURCE = '/assets/rosas-fondo.mp4';
+
+function initVideoLoading() {
+    if (!motionScrubVideo) return;
+
+    // Detection: Does this theme use video? 
+    // For now, only 'roses-premium' uses video.
+    const isVideoTheme = !weddingData.theme_id || weddingData.theme_id.includes('roses');
+
+    // Simulate preloader progress (Common to all themes)
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 8;
+        if (progress > 95) {
+            progress = 100;
+            clearInterval(interval);
+            if (!isVideoTheme) revealInvitation(); // For non-video themes, reveal now
+        }
+        if (logoFill) {
+            logoFill.style.clipPath = `inset(${100 - progress}% 0 0 0)`;
+        }
+    }, 80);
+
+    if (!isVideoTheme) {
+        console.log("Static Theme detected: Classic Silk. Skipping video load.");
+        if (motionScrubVideo) motionScrubVideo.style.display = 'none';
+        return;
+    }
+
+    // Initial load for video themes
     motionScrubVideo.src = VIDEO_SOURCE;
     motionScrubVideo.load();
 
@@ -94,9 +159,9 @@ resizeCanvas();
 
 // ─── PETAL PARTICLES ─────────────────────────────────────────────────────
 const petalImages = [new Image(), new Image(), new Image()];
-petalImages[0].src = 'assets/Recurso 7.png';
-petalImages[1].src = 'assets/Recurso 2.png';
-petalImages[2].src = 'assets/Recurso 1.png';
+petalImages[0].src = '/assets/Recurso 7.png';
+petalImages[1].src = '/assets/Recurso 2.png';
+petalImages[2].src = '/assets/Recurso 1.png';
 
 class Particle {
     constructor(isBurst = false) { 
@@ -386,21 +451,39 @@ window.submitRsvp = () => {
     }
 
     const name    = nameEl.value.trim();
-    const guests  = guestsEl ? (guestsEl.value || 1) : 1;
+    const guests  = parseInt(guestsEl ? (guestsEl.value || 1) : 1);
     const message = messageEl ? messageEl.value.trim() : '';
 
-    const WA_NUMBER = '18495127494';
-    const text = `¡Hola! Confirmo mi asistencia a la boda ✨%0A%0A*Nombre:* ${name}%0A*Acompañantes:* ${guests}${message ? `%0A*Mensaje:* ${message}` : ''}`;
-
-    window.open(`https://wa.me/${WA_NUMBER}?text=${text}`, '_blank');
-
-    const formWrap  = document.getElementById('rsvp-form-wrap');
-    const successEl = document.getElementById('rsvp-success');
-    if (formWrap)  formWrap.style.display  = 'none';
-    if (successEl) successEl.style.display = 'block';
-    if (window.lucide) window.lucide.createIcons();
+    // POST to SeCasan API
+    fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name,
+            guests,
+            message,
+            wedding_id: window.SECASAN_ID // Global ID from bootstrapper
+        })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            const formWrap  = document.getElementById('rsvp-form-wrap');
+            const successEl = document.getElementById('rsvp-success');
+            if (formWrap)  formWrap.style.display  = 'none';
+            if (successEl) successEl.style.display = 'block';
+            
+            // Also open WhatsApp as a backup/premium feature
+            const WA_NUMBER = weddingData.config?.whatsapp || '18495127494';
+            const text = `¡Hola! Confirmo mi asistencia a la boda ✨%0A%0A*Nombre:* ${name}%0A*Acompañantes:* ${guests}${message ? `%0A*Mensaje:* ${message}` : ''}`;
+            setTimeout(() => window.open(`https://wa.me/${WA_NUMBER}?text=${text}`, '_blank'), 1500);
+        } else {
+            alert(data.error || 'Ocurrió un error al confirmar.');
+        }
+    }).catch(err => {
+        console.error(err);
+        alert('Error de conexión.');
+    });
 };
 
 // ─── BOOT ────────────────────────────────────────────────────────────────
-initParticles();
-animate();
+// The init is now handled by the async initSeCasan called on DOMContentLoaded
+// ... initParticles() and animate() are called inside finalizeInit()
