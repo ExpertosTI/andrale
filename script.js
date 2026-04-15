@@ -16,19 +16,42 @@ let targetScroll = 0;
 let currentScroll = 0;
 let experienceStarted = true; // immediate
 
-// ─── PRELOADER & VIDEO BLOB ──────────────────────────────────────────────────
+// ─── PRELOADER & VIDEO ARCHITECTURE (ALTAMAR TECHNIQUE) ──────────────────────
 const preloader = document.getElementById('preloader');
 const logoFill = document.getElementById('logo-loader-fill');
 
+const VIDEO_CONFIG = {
+    starter: 'assets/the-bride-scrub.mp4', // Level 1: Optimized/Comprimido
+    master: 'assets/rosas-fondo.mp4'       // Level 2: Master HQ
+};
+
 /**
- * Advanced Asset Loading: Fetching video as Blob to prevent
- * range-request blocking and cancellations in high-scrub environments.
+ * Stage 1: Load the Starter video immediately.
+ * This allows the preloader to disappear as soon as the first frame is ready.
  */
-async function loadVideoAsBlob() {
-    const videoUrl = 'assets/rosas-fondo.mp4';
+function initDualVideoLoading() {
+    if (!motionScrubVideo) return;
+
+    // Load Starter version
+    motionScrubVideo.src = VIDEO_CONFIG.starter;
+    motionScrubVideo.load();
+
+    motionScrubVideo.addEventListener('loadeddata', () => {
+        console.log("Stage 1: Starter Video Ready.");
+        // Reveal site as soon as background is visible
+        setTimeout(revealInvitation, 500);
+        // Start downloading Master version in background
+        loadMasterBackground();
+    }, { once: true });
+}
+
+/**
+ * Stage 2: Fetch Master video as Blob in background.
+ */
+async function loadMasterBackground() {
     try {
-        const response = await fetch(videoUrl);
-        if (!response.ok) throw new Error('Network response was not ok');
+        const response = await fetch(VIDEO_CONFIG.master);
+        if (!response.ok) throw new Error('Master load failed');
         
         const reader = response.body.getReader();
         const contentLength = +response.headers.get('Content-Length');
@@ -42,8 +65,8 @@ async function loadVideoAsBlob() {
             chunks.push(value);
             receivedLength += value.length;
             
-            // Update Logo Fill (Bottom-up reveal)
-            if (contentLength && logoFill) {
+            // Log progress if needed (internal)
+            if (contentLength && logoFill && preloader.style.display !== 'none') {
                 const percent = Math.round((receivedLength / contentLength) * 100);
                 logoFill.style.clipPath = `inset(${100 - percent}% 0 0 0)`;
             }
@@ -52,20 +75,30 @@ async function loadVideoAsBlob() {
         const blob = new Blob(chunks);
         const objectUrl = URL.createObjectURL(blob);
         
-        if (motionScrubVideo) {
-            motionScrubVideo.src = objectUrl;
-            // Wait for metadata/first frame
-            motionScrubVideo.addEventListener('loadeddata', () => {
-                setTimeout(revealInvitation, 800);
-            }, { once: true });
-        }
+        // Stage 3: Seamless Swap
+        seamlessSwap(objectUrl);
+        
     } catch (error) {
-        console.error('Video load failed:', error);
-        if (motionScrubVideo) {
-            motionScrubVideo.src = videoUrl;
-            setTimeout(revealInvitation, 1000);
-        }
+        console.error('Master Stage failed:', error);
     }
+}
+
+/**
+ * Swaps video source without interrupting scroll position or view.
+ */
+function seamlessSwap(newSrc) {
+    if (!motionScrubVideo) return;
+    
+    const currentTime = motionScrubVideo.currentTime;
+    console.log("Stage 3: Seamless Swap to Master HQ.");
+    
+    // We create a temporary hidden video to ensure it's buffered? 
+    // Usually browser handles src swap well if cached as blob
+    motionScrubVideo.src = newSrc;
+    motionScrubVideo.currentTime = currentTime;
+    
+    // Smooth fade transition if possible? 
+    // Browsers might flicker. Altamar uses a direct swap.
 }
 
 function revealInvitation() {
@@ -73,15 +106,14 @@ function revealInvitation() {
         preloader.style.opacity = '0';
         setTimeout(() => {
             preloader.style.display = 'none';
-            // Start micro-animations
             document.body.classList.remove('loading');
         }, 800);
     }
 }
 
-// Start loading process
+// Start loading sequence
 if (preloader) {
-    loadVideoAsBlob();
+    initDualVideoLoading();
 }
 
 // ─── CANVAS RESIZE ────────────────────────────────────────────────────────

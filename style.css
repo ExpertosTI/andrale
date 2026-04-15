@@ -129,16 +129,17 @@ body {
     pointer-events: none;
     opacity: 0;
     transition: opacity 1.5s ease;
-    filter: brightness(0.45) saturate(1.1) contrast(1.1);
+    /* Optimized filters for mobile GPUs */
+    filter: brightness(0.4) saturate(1.1);
 }
 
 .video-overlay-mask {
     position: fixed; inset: 0; z-index: -1;
     background: linear-gradient(
         to bottom,
-        rgba(10, 14, 23, 0.3) 0%,
-        rgba(10, 14, 23, 0.55) 60%,
-        rgba(10, 14, 23, 0.85) 100%
+        rgba(10, 14, 23, 0.4) 0%,
+        rgba(10, 14, 23, 0.65) 60%,
+        rgba(10, 14, 23, 0.9) 100%
     );
     pointer-events: none;
 }
@@ -705,16 +706,37 @@ h2 {
 /* ===================================
    RESPONSIVE
    =================================== */
-@media (max-width: 600px) {
-    #hero-logo-img { max-width: 80vw; }
-    .hero-quote { font-size: 0.9rem; }
+@media (max-width: 768px) {
+    /* Fast preloader exit on mobile */
+    .loading { transition-duration: 0.4s; }
+    .logo-loader-wrap { width: 70vw; }
+    
+    /* Hero scaling */
+    #hero-logo-img { max-width: 80vw; margin-bottom: 2rem; }
+    .hero-title { font-size: 2.8rem; }
+    .hero-subtitle { font-size: 1rem; }
     .hero-date { font-size: 0.85rem; letter-spacing: 4px; }
-    .section { padding: 60px 16px; }
-    .glass-card { padding: 32px 20px; border-radius: 24px; }
-    .saga-card { border-radius: 24px; }
-    .detail-grid { gap: 12px; }
+    
+    /* Section & Content Spacing */
+    .section { padding: 40px 16px; }
+    .glass-card { 
+        padding: 24px 16px; 
+        width: calc(100% - 32px);
+        border-radius: 20px;
+    }
+    .section-title { font-size: 1.8rem; margin-bottom: 1rem; }
+    .section-text { font-size: 0.95rem; line-height: 1.5; }
+    
+    /* Countdown Compactness */
     .countdown-card { gap: 8px; }
-    .time-block { min-width: 64px; padding: 12px 8px; }
+    .time-block { min-width: 60px; padding: 10px 5px; border-radius: 12px; }
     .time-num { font-size: 1.4rem; }
-    .bg-video { object-fit: cover; transform: translate(-50%, -50%); }
+    .time-label { font-size: 0.5rem; letter-spacing: 1px; }
+
+    /* RSVP & Buttons */
+    .rsvp-submit-btn { width: 100%; padding: 14px; font-size: 0.9rem; }
+    
+    /* Background Video optimization */
+    .bg-video { filter: brightness(0.35) saturate(1); }
+    .fluid { filter: blur(50px); opacity: 0.08; } /* Lower blur and opacity for mobile GPU */
 }
