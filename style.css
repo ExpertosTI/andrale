@@ -744,28 +744,42 @@ h2 {
 /* ===================================
    FOOTER / BRANDING
    =================================== */
+.bg-video {
+    object-fit: cover;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    /* Hide potential browser UI artifacts */
+    -webkit-user-select: none;
+    user-select: none;
+    filter: brightness(0.4) saturate(1.1);
+}
+
+/* ===================================
+   FOOTER / BRANDING
+   =================================== */
 .renace-footer {
-    padding: 60px 20px 40px;
+    padding: 80px 20px 60px;
     text-align: center;
-    opacity: 0.25;
+    opacity: 0.15; /* Even more subtle */
     transition: opacity 0.3s ease;
 }
-.renace-footer:hover { opacity: 0.6; }
+.renace-footer:hover { opacity: 0.5; }
 
 .renace-brand {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     text-decoration: none;
     font-family: var(--font-body);
-    font-size: 0.55rem; /* Smaller powered text */
+    font-size: 0.45rem; /* Ultra-mini */
     color: var(--text-primary);
     letter-spacing: 2px;
     text-transform: uppercase;
 }
-.powered-text { font-size: 0.5rem; opacity: 0.7; }
+.powered-text { font-size: 0.4rem; opacity: 0.6; margin-right: 4px; }
 .renace-logo {
-    height: 18px; /* Slightly larger logo since text is gone */
+    height: 12px; /* Precision tiny logo */
     width: auto;
     filter: brightness(0) invert(1);
     transition: transform 0.3s ease;
