@@ -170,8 +170,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'landing.html'));
 });
 
-// Dashboard (Protected)
-app.get('/dashboard', checkAdmin, (req, res) => {
+// Dashboard (Allowed to load UI, API calls remain protected)
+app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
