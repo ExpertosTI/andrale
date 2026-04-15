@@ -3,207 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Boda de Andreína & Alejandro - 16 Mayo 2026</title>
+    <title>Invitación Premium | SeCasan</title>
+    <!-- Premium Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Alex+Brush&family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.525.0"></script>
-    <link rel="icon" type="image/svg+xml" href="/assets/renace.svg">
-    <link rel="stylesheet" href="/templates/shared/engine.css">
-    <link id="secasan-theme-link" rel="stylesheet" href="/templates/roses/theme.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --champagne: #F7E7CE;
+            --dark: #0A0A0A;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; background: var(--dark); color: #fff; font-family: var(--font-sans); overflow-x: hidden; }
+
+        /* Immersive Background */
+        .bg-container {
+            position: fixed; inset: 0; z-index: -1;
+            overflow: hidden;
+        }
+        .bg-video {
+            width: 100vw; height: 100vh; object-fit: cover;
+            filter: brightness(0.4) saturate(0.8);
+        }
+        .bg-overlay {
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        /* Elements */
+        .premium-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 60px 40px;
+            border-radius: 4px;
+            max-width: 600px;
+            margin: 40px auto;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .serif { font-family: var(--font-serif); }
+        .gold-glow { text-shadow: 0 0 20px rgba(212,175,55,0.4); color: var(--gold); }
+
+        h1 { font-size: 3.5rem; font-weight: 400; margin-bottom: 20px; line-height: 1; }
+        .quote { font-style: italic; font-size: 1.4rem; opacity: 0.8; margin-bottom: 40px; }
+        .date { letter-spacing: 5px; font-size: 0.9rem; text-transform: uppercase; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); display: inline-block; padding: 10px 20px; margin: 30px 0; }
+
+        .section-title { font-size: 2rem; margin-bottom: 30px; letter-spacing: 2px; }
+        .detail-row { margin-bottom: 20px; }
+        .label { color: var(--gold); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .value { font-family: var(--font-serif); font-size: 1.6rem; }
+
+        .btn-rsvp {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            padding: 15px 40px; font-size: 0.8rem; letter-spacing: 3px; cursor: pointer;
+            transition: 0.3s; margin-top: 40px; text-transform: uppercase;
+        }
+        .btn-rsvp:hover { background: var(--gold); color: #000; }
+
+        /* Animation */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 1s ease-out; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        #hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    </style>
 </head>
-<body class="is-scrolling">
-    <!-- Preloader -->
-    <div id="preloader" class="loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#111; z-index:9999;">
-        <div class="logo-loader-wrap">
-            <img src="/assets/Lettering.png" class="logo-loader-bg" alt="">
-            <img src="/assets/Lettering.png" id="logo-loader-fill" class="logo-loader-fill" alt="Andreina & Alejandro">
+<body>
+    <div class="bg-container">
+        <video class="bg-video" autoplay muted loop playsinline>
+            <source src="/assets/rosas-fondo.mp4" type="video/mp4">
+        </video>
+        <div class="bg-overlay"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="reveal">
+            <h1 class="serif gold-glow" id="data-wedding-title">Cargando...</h1>
+            <p class="quote serif" id="data-hero-quote"></p>
+            <div class="date" id="data-hero-date"></div>
+            <p class="serif" style="font-size:1.1rem; opacity:0.7;" id="data-hero-verses"></p>
         </div>
-    </div>
+    </nav>
 
-    <div class="fluid-effect" aria-hidden="true">
-        <div class="fluid"></div>
-        <div class="fluid"></div>
-        <div class="fluid"></div>
-    </div>
+    <!-- Main Sections -->
+    <main style="padding-bottom: 100px;">
+        <div class="premium-card reveal">
+            <h2 class="section-title serif gold-glow" id="data-reception-title">Evento</h2>
+            <div class="detail-row">
+                <span class="label">Ubicación</span>
+                <p class="value" id="data-reception-place"></p>
+            </div>
+            <div class="detail-row">
+                <span class="label">Hora</span>
+                <p class="value" id="data-reception-time"></p>
+            </div>
+            <p style="opacity:0.6; font-size:0.9rem;" id="data-reception-address"></p>
+        </div>
 
-    <!-- Scroll Hint Overlay -->
-    <div id="initial-scroll-prompt" class="entrance-overlay" style="background: transparent; z-index: 10; justify-content: flex-end; padding-bottom: 50px;">
-        <div class="entrance-info">
-            <div class="entrance-hint pulse-anim" style="opacity: 0.9;">
-                <i data-lucide="chevrons-up" style="width: 44px; height: 44px; color: var(--accent-teal); margin-bottom: 15px;"></i>
-                <p style="letter-spacing: 4px; font-size: 0.8rem; font-family: var(--font-display);">DESLIZA HACIA ARRIBA</p>
+        <div class="premium-card reveal">
+            <h2 class="section-title serif gold-glow" id="data-dress-title">Código de Vestimenta</h2>
+            <p class="value serif" id="data-dress-style" style="font-size:2rem;"></p>
+            <p style="opacity:0.7; margin: 20px 0;" id="data-dress-warning"></p>
+            <div style="border-top:1px solid rgba(212,175,55,0.1); padding-top:20px;">
+                <p style="font-size:0.8rem; letter-spacing:1px; color:var(--gold);" id="data-dress-kids"></p>
             </div>
         </div>
-    </div>
 
-    <!-- Universal Background Video -->
-    <video id="motion-scrub-video" src="/assets/rosas-fondo.mp4" 
-           muted playsinline webkit-playsinline autoplay disablePictureInPicture 
-           class="bg-video motion-scrub" preload="auto"></video>
-    <div class="video-overlay-mask"></div>
-
-    <!-- Gold Dust Canvas -->
-    <canvas id="canvas"></canvas>
-    <div class="scroll-progress" id="scroll-progress"></div>
-
-    <!-- Hero Overlay -->
-    <div id="hero-overlay" class="hero-content fixed-hero">
-        <!-- Dual logo stack: colored (base) + white (top, fades first) -->
-        <div class="logo-stack">
-            <img src="/assets/Lettering.png" id="hero-logo-color" alt="Andreina & Alejandro">
-            <img src="/assets/Lettering.png" id="hero-logo-img"   alt="Andreina & Alejandro">
+        <div class="premium-card reveal">
+            <h2 class="section-title serif gold-glow" id="data-gifts-title">Mesa de Regalos</h2>
+            <p style="opacity:0.8; line-height:1.6;" id="data-gifts-message"></p>
+            <div id="data-gifts-accounts" style="margin-top:30px;">
+                <!-- Accounts will be injected here -->
+            </div>
         </div>
-        <div id="hero-separator" class="hero-separator"></div>
-        <p class="hero-quote" id="data-hero-verse" data-immersive-text="fixed"></p>
-        <p class="hero-quote-book" id="data-hero-verse-book"></p>
-        <div class="hero-date" id="data-hero-date"></div>
-    </div>
 
-    <!-- Main Content -->
-    <main id="main-content" style="position: relative; z-index: 10;">
-        <!-- Pacer: Compacted for immediate dynamic response -->
-        <div id="intro-pacer" style="height: 110vh; width: 100%; pointer-events: none;"></div>
-
-        <!-- Reception (Data sourced from data.js) -->
-        <section class="section details" id="details">
-            <div class="glass-card saga-card">
-                <div class="icon-travel-wrap">
-                    <i data-lucide="car" class="card-icon auto-travel"></i>
-                    <div class="path-dash"></div>
-                    <i data-lucide="map-pin" class="card-icon destination-pin"></i>
-                </div>
-                <h2 data-immersive-text="section" id="data-reception-title"></h2>
-                <div class="detail-grid fade-in-text">
-                    <div class="grid-item">
-                        <span class="label">LUGAR</span>
-                        <p class="value" id="data-reception-place"></p>
-                    </div>
-                    <div class="grid-item">
-                        <span class="label">HORA</span>
-                        <p class="value" id="data-reception-time"></p>
-                    </div>
-                </div>
-                <p class="address fade-in-text" id="data-reception-address"></p>
-                <div class="map-links fade-in-text">
-                    <a href="javascript:void(0)" onclick="window.open(weddingData.reception.map_google, '_blank')" class="btn-map" title="Google Maps"><i data-lucide="map"></i></a>
-                    <a href="javascript:void(0)" onclick="window.open(weddingData.reception.map_waze, '_blank')" class="btn-map" title="Waze"><i data-lucide="navigation"></i></a>
-                    <a href="javascript:void(0)" onclick="window.location.href = weddingData.reception.map_apple" class="btn-map" title="Apple Maps"><i data-lucide="map-pin"></i></a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Dress Code -->
-        <section class="section rules" id="rules">
-            <div class="glass-card saga-card">
-                <div class="shopping-icons">
-                    <i data-lucide="shirt" class="card-icon icon-shop-1"></i>
-                    <i data-lucide="gem" class="card-icon icon-shop-2"></i>
-                    <i data-lucide="watch" class="card-icon icon-shop-3"></i>
-                </div>
-                <h2 data-immersive-text="section" id="data-dress-title"></h2>
-                <p class="style-title" data-immersive-text="section" id="data-dress-style"></p>
-                <div class="style-warning fade-in-text" id="data-dress-warning"></div>
-                <div class="divider fade-in-text"></div>
-                <div class="no-kids fade-in-text">
-                    <i data-lucide="baby" class="icon-forbidden"></i>
-                    <p id="data-dress-kids"></p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Gifts -->
-        <section class="section gifts" id="gifts">
-            <div class="glass-card saga-card">
-                <div class="gifts-pile">
-                    <i data-lucide="gift" class="card-icon gift-back-left"></i>
-                    <i data-lucide="gift" class="card-icon gift-back-right"></i>
-                    <i data-lucide="gift" class="card-icon gift-front"></i>
-                </div>
-                <h2 data-immersive-text="section" id="data-gifts-title"></h2>
-                <p class="gift-intro fade-in-text" id="data-gifts-message"></p>
-                
-                <div class="account-list fade-in-text" id="data-gifts-accounts">
-                    <!-- Populated by data.js -->
-                </div>
-
-                <div class="holder-info fade-in-text" id="data-gifts-holder"></div>
-            </div>
-        </section>
-
-        <!-- Final Section: Closing, Countdown & RSVP -->
-        <section class="section final-wrap" id="closing">
-            <div class="glass-card saga-card">
-                <p class="closing-message-text fade-in-text" id="data-closing-message"></p>
-                
-                <div class="countdown-card fade-in-text" id="countdown">
-                    <div class="time-block"><span id="cd-days" class="time-num">00</span><span class="time-label">DÍAS</span></div>
-                    <div class="time-block"><span id="cd-hours" class="time-num">00</span><span class="time-label">HORAS</span></div>
-                    <div class="time-block"><span id="cd-mins" class="time-num">00</span><span class="time-label">MINUTOS</span></div>
-                    <div class="time-block"><span id="cd-secs" class="time-num">00</span><span class="time-label">SEGUNDOS</span></div>
-                </div>
-
-                <div class="rsvp-final-wrap fade-in-text" style="margin-top: 40px;">
-                    <button class="rsvp-submit-btn" id="rsvp-open" onclick="openRsvpModal()" style="max-width: 300px; margin: 0 auto;">
-                        <i data-lucide="heart" style="width:18px; height:18px; margin-right:8px;"></i>
-                        CONFIRMAR ASISTENCIA
-                    </button>
-                </div>
-            </div>
-        </section>
-
+        <div style="text-align: center; margin-top: 60px;">
+            <button class="btn-rsvp" onclick="confirmRSVP()">Confirmar Asistencia</button>
+        </div>
     </main>
 
-    <!-- RSVP Modal -->
-    <div id="rsvp-modal" class="rsvp-modal-overlay">
-        <div class="rsvp-modal-card glass-card">
-            <button class="rsvp-close" onclick="closeRsvpModal()">&times;</button>
-            <h3 class="rsvp-modal-title">Confirmar Asistencia</h3>
-            <div id="rsvp-form-wrap">
-                <input type="text" id="rsvp-name" class="rsvp-input" placeholder="Tu nombre completo" required>
-                <input type="number" id="rsvp-guests" class="rsvp-input" placeholder="Número de acompañantes" min="1" max="10" value="1">
-                <textarea id="rsvp-message" class="rsvp-input rsvp-textarea" placeholder="Mensaje para los novios (opcional)" rows="3"></textarea>
-                <button class="rsvp-submit-btn" id="rsvp-submit" onclick="submitRsvp()">
-                    <i data-lucide="send" style="width:18px; height:18px; margin-right:8px;"></i>
-                    Confirmar
-                </button>
-            </div>
-            <div id="rsvp-success" class="rsvp-success" style="display:none;">
-                <i data-lucide="check-circle" style="width:60px; height:60px; color:var(--accent-gold); margin-bottom:20px;"></i>
-                <h4>¡Gracias!</h4>
-                <p>Los esperamos con mucho amor.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast" class="toast">¡Copiado!</div>
-
-    <footer class="renace-footer">
-        <a href="https://renace.tech" target="_blank" rel="noopener" class="renace-brand">
-            <span class="powered-text">Powered by</span>
-            <img src="/assets/renace.svg" alt="Renace Tech" class="renace-logo">
-        </a>
+    <footer style="text-align: center; padding: 40px; opacity: 0.3; font-size: 0.7rem; letter-spacing: 2px;">
+        POWERED BY RENACE TECH & SECASAN AI
     </footer>
 
     <script>
-        // SeCasan Multi-tenant Bootstrapper
-        window.SECASAN_SLUG = window.location.pathname.startsWith('/v/') ? window.location.pathname.split('/v/')[1].split('?')[0] : null;
+        const slug = window.location.pathname.split('/').pop();
         
-        // Helper to load theme link before script.js reaches content
-        async function preBootstrap() {
-            if(!window.SECASAN_SLUG) return;
+        async function loadWedding() {
             try {
-                const res = await fetch(`/api/wedding/${window.SECASAN_SLUG}`);
+                const res = await fetch(`/api/wedding/${slug}`);
+                if (!res.ok) throw new Error('No encotrada');
                 const data = await res.json();
-                if(data.theme_id) {
-                   document.getElementById('secasan-theme-link').href = `/templates/${data.theme_id.split('-')[0]}/theme.css`;
+                const content = JSON.parse(data.content);
+
+                document.title = data.title || 'Nuestra Boda';
+                document.getElementById('data-wedding-title').innerText = data.title;
+                document.getElementById('data-hero-quote').innerText = content.hero.quote;
+                document.getElementById('data-hero-date').innerText = content.hero.date;
+                document.getElementById('data-hero-verses').innerText = content.hero.verses;
+
+                document.getElementById('data-reception-title').innerText = content.reception.title;
+                document.getElementById('data-reception-place').innerText = content.reception.place;
+                document.getElementById('data-reception-time').innerText = content.reception.time;
+                document.getElementById('data-reception-address').innerText = content.reception.address;
+
+                document.getElementById('data-dress-title').innerText = content.dressCode.title;
+                document.getElementById('data-dress-style').innerText = content.dressCode.style;
+                document.getElementById('data-dress-warning').innerText = content.dressCode.warning;
+                document.getElementById('data-dress-kids').innerText = content.dressCode.kids;
+
+                document.getElementById('data-gifts-title').innerText = content.gifts.title;
+                document.getElementById('data-gifts-message').innerText = content.gifts.message;
+
+                // Simple account injection
+                const accountsContainer = document.getElementById('data-gifts-accounts');
+                if (content.gifts.accounts) {
+                    content.gifts.accounts.forEach(acc => {
+                        const div = document.createElement('div');
+                        div.style.marginBottom = '15px';
+                        div.innerHTML = `<span style="display:block; font-size:0.7rem; opacity:0.5;">${acc.bank}</span><span class="serif" style="font-size:1.2rem;">${acc.account}</span>`;
+                        accountsContainer.appendChild(div);
+                    });
                 }
-            } catch(e) {}
+
+                initObservers();
+            } catch (e) {
+                document.body.innerHTML = '<div style="height:100vh; display:flex; align-items:center; justify-content:center;"><h1>Boda no encontrada</h1></div>';
+            }
         }
-        preBootstrap();
+
+        function initObservers() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        function confirmRSVP() {
+            alert("Redirigiendo a confirmación...");
+        }
+
+        loadWedding();
     </script>
-    <script src="/script.js"></script>
-    <script>lucide.createIcons();</script>
 </body>
 </html>
-

@@ -360,114 +360,110 @@ app.get('/api/stats', adminRateLimit, checkAdmin, (req, res) => {
     }
 });
 
-// ========== AI & SAAS ENDPOINTS ==========
-app.post('/api/ai/generate', adminRateLimit, checkAdmin, async (req, res) => {
-    try {
-        const { prompt } = req.body;
-        if (!prompt) return res.status(400).json({ error: 'Prompt es requerido' });
+// AI Generation (Mock fallback for Demo Mode)
+app.post('/api/ai/generate', adminRateLimit, async (req, res) => {
+    const { prompt } = req.body;
+    const providedKey = req.query.key;
+    
+    // Safety check for empty prompt
+    if (!prompt) return res.status(400).json({ error: 'Prompt es requerido' });
 
-        // Get keys from DB
-        const settings = {};
-        db.prepare('SELECT * FROM settings').all().forEach(s => settings[s.key] = s.value);
-        
-        const provider = settings.ai_provider || 'anthropic';
-        let content = '';
-
-        if (provider === 'google' && settings.google_key) {
-            // GEMINI 2.0 FLASH (Correct & Updated way)
-            console.log('Using Gemini 2.0 Flash engine...');
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${settings.google_key}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `Actúa como un diseñador de bodas premium. Genera una invitación en formato JSON puro.
-                            Prompt del usuario: ${prompt}
-                            
-                            ESPECIFICACIÓN DEL JSON:
-                            {
-                                "hero": { "quote": "Frase romántica", "verses": "Versículo o frase corta", "date": "16 Mayo 2026" },
-                                "reception": { "title": "Boda & Recepción", "place": "Nombre Lugar", "time": "16:00", "address": "Dirección completa", "map_google": "#", "map_waze": "#", "map_apple": "#" },
-                                "dressCode": { "title": "Dress Code", "style": "Formal / Guayabera", "warning": "Traje oscuro", "kids": "No niños" },
-                                "gifts": { "title": "Regalos", "message": "Tu presencia es nuestro mejor regalo...", "accounts": [{ "bank": "Banco X", "account": "123", "type": "Ahorros", "holder": "Nombre" }] },
-                                "closing": { "message": "¡Te esperamos!" },
-                                "config": { "whatsapp": "18495127494", "theme": "roses-premium" }
-                            }
-                            Responde ÚNICAMENTE el objeto JSON.`
-                        }]
-                    }],
-                    generationConfig: {
-                        response_mime_type: "application/json"
-                    }
-                })
-            });
-            const data = await response.json();
-            if(!data.candidates?.[0]) {
-                console.error('Gemini Error Response:', JSON.stringify(data));
-                throw new Error(data.error?.message || 'Gemini no devolvió contenido');
-            }
-            content = data.candidates[0].content.parts[0].text;
-        } else {
-            // CLAUDE ANTHROPIC 
-            const apiKey = settings.anthropic_key || process.env.ANTHROPIC_API_KEY;
-            if(!apiKey || apiKey === 'REPLACE_WITH_KEY_IF_NEEDED') throw new Error('Anthropic API Key no configurada en Ajustes');
+    // ONLY attempt real AI if the key is correct or provided via DB
+    const adminKey = process.env.WEDDING_ADMIN_KEY;
+    if (providedKey === adminKey && adminKey) {
+        try {
+            // Get keys from DB Settings
+            const settings = {};
+            db.prepare('SELECT * FROM settings').all().forEach(s => settings[s.key] = s.value);
             
-            console.log('Using Claude engine...');
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'x-api-key': apiKey,
-                    'anthropic-version': '2023-06-01',
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'claude-3-opus-20240229',
-                    max_tokens: 1500,
-                    system: `Eres el motor de IA de SeCasan. Genera el JSON de la invitación.`,
-                    messages: [{ role: 'user', content: prompt }]
-                })
-            });
-            const data = await response.json();
-            if(!data.content?.[0]) throw new Error('Error en Claude');
-            content = data.content[0].text;
-        }
+            const provider = settings.ai_provider || 'anthropic';
+            let content = '';
 
-        const weddingData = extractJSON(content);
-        res.json(weddingData);
-    } catch (e) {
-        console.warn('AI Generation Fallback (Demo Mode):', e.message);
-        // Return high-quality Mock data for Demo purposes
-        res.json({
-            "hero": { 
-                "quote": "Donde hay amor, hay vida.", 
-                "verses": "Dos almas que se encuentran para caminar juntas bajo el mismo sol.", 
-                "date": "16 de Mayo, 2026" 
-            },
-            "reception": { 
-                "title": "Ceremonia & Recepción", 
-                "place": "Palacio de los Capitanes", 
-                "time": "18:00", 
-                "address": "Casco Histórico, Santo Domingo", 
-                "map_google": "https://maps.google.com", 
-                "map_waze": "#", 
-                "map_apple": "#" 
-            },
-            "dressCode": { 
-                "title": "Código de Vestimenta", 
-                "style": "Formal / Black Tie", 
-                "warning": "Se recomienda evitar colores claros", 
-                "kids": "Evento exclusivo para adultos" 
-            },
-            "gifts": { 
-                "title": "Regalos", 
-                "message": "Vuestra compañía es nuestro mayor tesoro, pero si deseáis hacernos un detalle...", 
-                "accounts": [{ "bank": "Banco SeCasan", "account": "000-000000-0", "type": "Ahorros", "holder": "Demo Account" }] 
-            },
-            "closing": { "message": "¡Estamos ansiosos por celebrar con vosotros!" },
-            "config": { "whatsapp": "1000000000", "theme": "roses-premium" }
-        });
+            if (provider === 'google' && settings.google_key) {
+                console.log('Using Gemini 2.0 Flash engine...');
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${settings.google_key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `Actúa como un diseñador de bodas premium. Genera una invitación en formato JSON puro.
+                                Prompt del usuario: ${prompt}
+                                
+                                ESPECIFICACIÓN DEL JSON:
+                                {
+                                    "hero": { "quote": "Frase romántica", "verses": "Versículo o frase corta", "date": "16 Mayo 2026" },
+                                    "reception": { "title": "Boda & Recepción", "place": "Nombre Lugar", "time": "16:00", "address": "Dirección completa", "map_google": "#", "map_waze": "#", "map_apple": "#" },
+                                    "dressCode": { "title": "Dress Code", "style": "Formal / Guayabera", "warning": "Traje oscuro", "kids": "No niños" },
+                                    "gifts": { "title": "Regalos", "message": "Tu presencia es nuestro mejor regalo...", "accounts": [{ "bank": "Banco X", "account": "123", "type": "Ahorros", "holder": "Nombre" }] },
+                                    "closing": { "message": "¡Te esperamos!" },
+                                    "config": { "whatsapp": "18495127494", "theme": "roses-premium" }
+                                }
+                                Responde ÚNICAMENTE el objeto JSON.`
+                            }]
+                        }],
+                        generationConfig: { response_mime_type: "application/json" }
+                    })
+                });
+                const data = await response.json();
+                if(data.candidates?.[0]) content = data.candidates[0].content.parts[0].text;
+            } else {
+                const apiKey = settings.anthropic_key || process.env.ANTHROPIC_API_KEY;
+                if(apiKey && apiKey !== 'REPLACE_WITH_KEY_IF_NEEDED') {
+                    const response = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+                        body: JSON.stringify({
+                            model: 'claude-3-opus-20240229',
+                            max_tokens: 1500,
+                            system: `Eres el motor de IA de SeCasan. Genera el JSON de la invitación.`,
+                            messages: [{ role: 'user', content: prompt }]
+                        })
+                    });
+                    const data = await response.json();
+                    if(data.content?.[0]) content = data.content[0].text;
+                }
+            }
+
+            if (content) {
+                const weddingData = extractJSON(content);
+                return res.json(weddingData);
+            }
+        } catch (e) {
+            console.warn('Real AI Failed or Keys Missing, falling back to Mock:', e.message);
+        }
     }
+
+    // Default: Return high-quality Mock data for Demo purposes
+    res.json({
+        "hero": { 
+            "quote": "Donde hay amor, hay vida.", 
+            "verses": "Dos almas que se encuentran para caminar juntas bajo el mismo sol.", 
+            "date": "16 de Mayo, 2026" 
+        },
+        "reception": { 
+            "title": "Ceremonia & Recepción", 
+            "place": "Palacio de los Capitanes", 
+            "time": "18:00", 
+            "address": "Casco Histórico, Santo Domingo", 
+            "map_google": "https://maps.google.com", 
+            "map_waze": "#", 
+            "map_apple": "#" 
+        },
+        "dressCode": { 
+            "title": "Código de Vestimenta", 
+            "style": "Formal / Black Tie", 
+            "warning": "Se recomienda evitar colores claros", 
+            "kids": "Evento exclusivo para adultos" 
+        },
+        "gifts": { 
+            "title": "Regalos", 
+            "message": "Vuestra compañía es nuestro mayor tesoro, pero si deseáis hacernos un detalle...", 
+            "accounts": [{ "bank": "Banco SeCasan", "account": "000-000000-0", "type": "Ahorros", "holder": "Invitados" }] 
+        },
+        "closing": { "message": "¡Estamos ansiosos por celebrar con vosotros!" },
+        "config": { "whatsapp": "1000000000", "theme": "roses-premium" }
+    });
 });
 
 // Create new wedding (Protected)
