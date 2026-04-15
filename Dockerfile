@@ -1,10 +1,21 @@
-FROM nginx:alpine
+FROM node:20-alpine
 
-# Copy static assets to nginx html directory
-COPY . /usr/share/nginx/html/
+WORKDIR /app
 
-# Expose port 80
-EXPOSE 80
+# Install tzdata for correct time zones
+RUN apk add --no-cache tzdata
 
-# The default nginx command will start the server
-CMD ["nginx", "-g", "daemon off;"]
+COPY package*.json ./
+RUN npm install --omit=dev
+
+COPY . .
+
+# Ensure data directory exists
+RUN mkdir -p /app/data
+
+EXPOSE 3000
+
+ENV NODE_ENV=production
+ENV TZ=America/Santo_Domingo
+
+CMD ["node", "server.js"]
