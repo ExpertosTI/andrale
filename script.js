@@ -1,378 +1,283 @@
+/* ========================================================
+   WEDDING INVITATION — SCRIPT PRINCIPAL
+   Andreína & Alejandro — 16 Mayo 2026
+   ======================================================== */
+
+// ─── CANVAS & PARTICLES ────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
 const progressBar = document.getElementById('scroll-progress');
-
-console.log('[LOG] Script initialized');
-
+const motionScrubVideo = document.getElementById('motion-scrub-video');
+const heroLogoImg = document.getElementById('hero-logo-img');
 const sections = document.querySelectorAll('.section');
-const rootStyle = document.documentElement.style;
-
-const bgVideo = document.getElementById('bg-video');
-const introVideoScrub = document.getElementById('intro-scrub-video');
-const introVideoWrap = document.getElementById('intro-video-wrap');
-const entranceOverlay = document.getElementById('entrance-overlay');
 
 let particles = [];
-const baseParticleCount = window.innerWidth < 600 ? 550 : 800;
-let targetParticleCount = baseParticleCount;
-let experienceStarted = false;
 let targetScroll = 0;
 let currentScroll = 0;
+let experienceStarted = true; // immediate
 
-let pointerX = -1000;
-let pointerY = -1000;
-window.addEventListener('mousemove', (e) => { pointerX = e.clientX; pointerY = e.clientY; }, { passive: true });
-window.addEventListener('touchmove', (e) => { if (e.touches[0]) { pointerX = e.touches[0].clientX; pointerY = e.touches[0].clientY; } }, { passive: true });
-
-// LOGGING SYSTEM
-const logger = (msg) => {
-    const now = new Date();
-    const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
-    console.log(`[INVITATION-LOG] [${timestamp}] ${msg}`);
-};
-
-// PRELOADER SYSTEM
+// ─── PRELOADER ────────────────────────────────────────────────────────────
 const preloader = document.getElementById('preloader');
-const loadingBar = document.getElementById('loading-bar');
-const loadingText = document.getElementById('loading-text');
-
-let loadedAssets = 0;
-const totalAssets = 2; // intro + bg videos
-
-const updateLoadingProgress = () => {
-    loadedAssets++;
-    const progress = (loadedAssets / totalAssets) * 100;
-    if (loadingBar) loadingBar.style.width = `${progress}%`;
-    if (loadingText) loadingText.innerText = `Cargando activos... ${Math.round(progress)}%`;
-    
-    if (loadedAssets >= totalAssets) {
-        setTimeout(() => {
-            if (preloader) preloader.classList.add('hidden');
-            experienceStarted = true;
-            logger('Experience Started (All assets loaded)');
-        }, 800);
-    }
-};
-
-// LAYERED RENDERING: Fetch as Blob to guarantee 200 OK (no 206 partial content loops)
-const loadOptimizedVideo = (videoEl, tinySrc, hqSrc) => {
-    if (!videoEl) {
-        updateLoadingProgress(); // Count as loaded if element doesn't exist
-        return;
-    }
-    
-    // Initial fetch for tiny video
-    fetch(tinySrc)
-        .then(response => response.blob())
-        .then(blob => {
-            const tinyUrl = URL.createObjectURL(blob);
-            videoEl.src = tinyUrl;
-            
-            // For scrubbing videos, we want HQ as soon as possible
-            fetch(hqSrc)
-                .then(r => r.blob())
-                .then(hqBlob => {
-                    const hqUrl = URL.createObjectURL(hqBlob);
-                    const currentTime = videoEl.currentTime;
-                    videoEl.src = hqUrl;
-                    videoEl.currentTime = currentTime;
-                    updateLoadingProgress();
-                    logger(`HQ video loaded: ${hqSrc}`);
-                })
-                .catch(e => {
-                    updateLoadingProgress(); // Still proceed
-                    logger(`Failed to load HQ: ${hqSrc}`);
-                });
-        })
-        .catch(e => {
-            updateLoadingProgress(); // Still proceed
-            logger(`Failed to load tiny: ${tinySrc}`);
-        });
-};
-
-if (introVideoScrub) {
-    loadOptimizedVideo(introVideoScrub, 'assets/intro-scrub-tiny.mp4', 'assets/intro-scrub-hq.mp4');
-} else {
-    updateLoadingProgress();
+if (preloader) {
+    if (motionScrubVideo) motionScrubVideo.load();
+    setTimeout(() => preloader.classList.add('hidden'), 600);
 }
 
-if (bgVideo) {
-    loadOptimizedVideo(bgVideo, 'assets/bg-tiny.mp4', 'assets/bg-hq.mp4');
-} else {
-    updateLoadingProgress();
-}
-
+// ─── CANVAS RESIZE ────────────────────────────────────────────────────────
 const resizeCanvas = () => {
     if (!canvas) return;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 };
-
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize', resizeCanvas, { passive: true });
 resizeCanvas();
 
+// ─── PETAL PARTICLES ─────────────────────────────────────────────────────
+const petalImages = [new Image(), new Image(), new Image()];
+petalImages[0].src = 'assets/Recurso 7.png';
+petalImages[1].src = 'assets/Recurso 2.png';
+petalImages[2].src = 'assets/Recurso 1.png';
+
 class Particle {
-    constructor() {
-        this.reset(true);
-    }
+    constructor() { this.reset(true); }
 
     reset(initial = false) {
-        // Dust: Many small particles
-        this.x = Math.random() * canvas.width;
-        this.y = initial ? Math.random() * canvas.height : (targetScroll > currentScroll ? canvas.height + 20 : -20);
-        
-        this.size = Math.random() * 1.5 + 0.5; // Smaller size for dust
-        this.depth = Math.random() * 0.8 + 0.2;
-        this.baseOpacity = Math.random() * 0.4 + 0.1;
-        
-        // Motion: light and fluid
+        this.x = Math.random() * (canvas ? canvas.width : 400);
+        this.y = initial
+            ? Math.random() * (canvas ? canvas.height : 800)
+            : -60;
+        this.img = petalImages[Math.floor(Math.random() * petalImages.length)];
+        this.size = Math.random() * 18 + 8;
+        if (Math.random() > 0.85) this.size *= 1.4;
+        this.depth = Math.random() * 0.7 + 0.3;
+        this.opacity = Math.random() * 0.5 + 0.15;
         this.offsetY = Math.random() * 50 - 25;
-        this.offsetX = Math.random() * 20 - 10;
-        this.vx = (Math.random() - 0.5) * 0.15;
-        this.vy = (Math.random() - 0.5) * 0.15;
-        
-        this.shimmerPhase = Math.random() * Math.PI * 2;
-        // Use a mix of gold and teal particles
-        const rand = Math.random();
-        if (rand > 0.7) this.color = '#2dd4bf'; // Teal
-        else if (rand > 0.4) this.color = '#fcf6ba'; // Light gold
-        else this.color = '#d4af37'; // Deep gold
+        this.vx = (Math.random() - 0.5) * 1.2;
+        this.vy = Math.random() * 1.2 + 0.4;
+        this.angle = Math.random() * Math.PI * 2;
+        this.spin = (Math.random() - 0.5) * 0.04;
     }
 
     update() {
-        // FLUID DUST FLOW: Particles follow scroll with slight lag
         const scrollDelta = targetScroll - currentScroll;
-        
-        // Fluid horizontal drifting
-        this.x += Math.sin(currentScroll * 0.005 + this.offsetY) * 0.3 + this.vx;
-        
-        // Vertical viscous drag from scroll
-        this.y -= scrollDelta * 0.015 * this.depth; 
-        
-        // Intrinsic slow float
-        this.y -= 0.1 * this.depth + this.vy;
-
-        // Gravity pull towards user pointer
-        if (pointerX > -500 && pointerY > -500) {
-            const dx = pointerX - this.x;
-            const dy = pointerY - this.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 150 && dist > 5) {
-                this.x += (dx / dist) * 1.8; 
-                this.y += (dy / dist) * 1.8;
-            }
-        }
-
-        this.shimmerPhase += 0.05;
-        this.opacity = this.baseOpacity + Math.sin(this.shimmerPhase) * 0.25;
-
-        // Wrap around smoothly
-        if (this.y < -50) this.y = canvas.height + 50;
-        if (this.y > canvas.height + 50) this.y = -50;
-        if (this.x < -20) this.x = canvas.width + 20;
-        if (this.x > canvas.width + 20) this.x = -20;
+        const scrollVelocity = Math.abs(scrollDelta);
+        const flutter = Math.sin(Date.now() * 0.0015 + this.offsetY) * 1.0;
+        this.x += (flutter + this.vx) * (1 + scrollVelocity * 0.08 * this.depth);
+        this.y -= scrollDelta * 0.012 * this.depth;
+        this.y += (0.5 * this.depth + this.vy);
+        this.angle += this.spin * (1 + scrollVelocity * 0.05);
+        if (this.y > canvas.height + 80) this.y = -80;
+        if (this.y < -80) this.y = canvas.height + 80;
+        if (this.x < -80) this.x = canvas.width + 80;
+        if (this.x > canvas.width + 80) this.x = -80;
     }
 
     draw() {
+        if (!ctx || !this.img.complete || this.img.naturalWidth === 0) return;
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = Math.max(0, this.opacity);
-        
-        // Draw crisp circular dust
-        ctx.beginPath();
-        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.rotate(this.angle);
+        ctx.globalAlpha = this.opacity;
+        ctx.drawImage(this.img, -this.size / 2, -this.size / 2, this.size, this.size);
         ctx.restore();
     }
 }
 
 const initParticles = () => {
     particles = [];
-    const count = window.innerWidth < 600 ? 550 : baseParticleCount;
-    for (let i = 0; i < count; i += 1) {
-        particles.push(new Particle());
-    }
+    const count = window.innerWidth < 600 ? 100 : 180;
+    for (let i = 0; i < count; i++) particles.push(new Particle());
 };
 
-const animate = () => {
-    if (!ctx || !canvas) return;
-    
-    // Snappier fluid interpolation (0.1 instead of 0.08)
-    currentScroll += (targetScroll - currentScroll) * 0.1;
-    
-    // Draw Particles
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach((p) => { p.update(); p.draw(); });
-
-    if (experienceStarted) {
-        const vh = window.innerHeight;
-        const scrollMax = document.documentElement.scrollHeight - vh;
-        
-        if (progressBar) {
-            const progress = (currentScroll / scrollMax) * 100;
-            progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
-        }
-
-        const introZone = vh * 1.5; // Adjusted intro zone for better pacing
-        
-        // VIDEO SCRUBBING OPTIMIZATION
-        const updateVideoScrub = (video, ratio) => {
-            if (!video || isNaN(video.duration)) return;
-            const targetTime = ratio * (video.duration - 0.05);
-            
-            // Only update if difference > 0.033s (approx 1 frame at 30fps) to reduce GPU load
-            if (Math.abs(video.currentTime - targetTime) > 0.033) {
-                video.currentTime = targetTime;
-            }
-
-            // PARALLAX SCALE EFFECT (Pescaderia Style)
-            // As we scroll, the video scales slightly to give depth
-            const scale = 1 + (ratio * 0.05); 
-            video.style.transform = `translate(-50%, -50%) translateZ(0) scale(${scale})`;
-        };
-
-        if (currentScroll < introZone) {
-            if (introVideoScrub) {
-                if (bgVideo && bgVideo.classList.contains('is-visible')) bgVideo.classList.remove('is-visible');
-
-                const ratio = Math.max(0, currentScroll / introZone);
-                updateVideoScrub(introVideoScrub, ratio);
-                introVideoScrub.classList.add('is-visible');
-
-                // Hero Overlay Logic
-                const hero = document.getElementById('hero-overlay');
-                if (hero) {
-                    const heroOpacity = Math.max(0, Math.min(1, (ratio - 0.5) * 4)); // Fades in between 0.5 and 0.75 ratio
-                    hero.style.opacity = heroOpacity;
-                    hero.classList.toggle('is-visible', heroOpacity > 0);
-                }
-            }
-        } else {
-            if (bgVideo) {
-                const bgScrollRange = scrollMax - introZone;
-                const currentBgScroll = currentScroll - introZone;
-                const bgRatio = Math.max(0, currentBgScroll / bgScrollRange);
-                updateVideoScrub(bgVideo, bgRatio);
-                bgVideo.classList.add('is-visible');
-            }
-            if (introVideoScrub) introVideoScrub.classList.remove('is-visible');
-            
-            const hero = document.getElementById('hero-overlay');
-            if (hero) hero.style.opacity = 0;
-        }
-
-        // Section Reveal logic (Pescaderia Style: rising from depth)
-        sections.forEach((section) => {
-            const rect = section.getBoundingClientRect();
-            const viewCenter = vh / 2;
-            const sectionCenter = rect.top + rect.height / 2;
-            const distFromCenter = (sectionCenter - viewCenter) / vh;
-            
-            // Activate section when it's near the viewport
-            if (rect.top < vh * 0.8 && rect.bottom > vh * 0.2) {
-                section.classList.add('active');
-                
-                // Parallax/Depth effect based on distance from center
-                const intensity = Math.min(1, Math.max(0, 1 - Math.abs(distFromCenter) * 1.2));
-                const translateY = distFromCenter * 50;
-                const scale = 0.95 + (0.05 * intensity);
-                
-                section.style.transform = `translateY(${translateY}px) scale(${scale})`;
-                section.style.opacity = intensity;
-
-                // Toggle visibility for children based on intensity
-                const showChildren = intensity > 0.4;
-                section.querySelectorAll('[data-immersive-text]').forEach(t => t.classList.toggle('is-visible', showChildren));
-                section.querySelectorAll('.fade-in-text').forEach(t => t.classList.toggle('is-visible', showChildren));
-            } else {
-                section.classList.remove('active');
-                section.style.opacity = 0;
-                section.querySelectorAll('.is-visible').forEach(t => t.classList.remove('is-visible'));
-            }
-        });
-    }
-
-    requestAnimationFrame(animate);
-};
-
+// ─── IMMERSIVE TEXT ──────────────────────────────────────────────────────
 const prepareImmersiveText = () => {
-    document.querySelectorAll('[data-immersive-text]').forEach((element) => {
+    document.querySelectorAll('[data-immersive-text]').forEach(element => {
         if (element.dataset.textPrepared === 'true') return;
         const tokens = element.textContent.split(/(\s+)/);
         const fragment = document.createDocumentFragment();
         let charIdx = 0;
-        tokens.forEach((token) => {
+        tokens.forEach(token => {
             if (!token) return;
-            if (/^\s+$/.test(token)) { fragment.appendChild(document.createTextNode(token)); return; }
-            const word = document.createElement('span'); word.className = 'text-word';
-            [...token].forEach((char) => {
-                const span = document.createElement('span'); span.className = 'text-char';
-                span.textContent = char; span.style.setProperty('--char-index', charIdx++);
+            if (/^\s+$/.test(token)) {
+                fragment.appendChild(document.createTextNode(token));
+                return;
+            }
+            const word = document.createElement('span');
+            word.className = 'text-word';
+            [...token].forEach(char => {
+                const span = document.createElement('span');
+                span.className = 'text-char';
+                span.textContent = char;
+                span.style.setProperty('--char-index', charIdx++);
                 word.appendChild(span);
             });
             fragment.appendChild(word);
         });
-        element.textContent = ''; element.appendChild(fragment);
+        element.textContent = '';
+        element.appendChild(fragment);
         element.dataset.textPrepared = 'true';
     });
 };
 
-// Countdown Logic
+// ─── COUNTDOWN ───────────────────────────────────────────────────────────
 const targetDate = new Date('2026-05-16T16:00:00').getTime();
 const updateCountdown = () => {
-    const now = new Date().getTime();
-    const distance = targetDate - now;
-    if (distance < 0) return;
-    
+    const dist = targetDate - Date.now();
+    if (dist < 0) return;
     const d = document.getElementById('cd-days');
     const h = document.getElementById('cd-hours');
     const m = document.getElementById('cd-mins');
     const s = document.getElementById('cd-secs');
-
-    if (d) d.innerText = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-    if (h) h.innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-    if (m) m.innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-    if (s) s.innerText = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
+    if (d) d.innerText = Math.floor(dist / 86400000).toString().padStart(2, '0');
+    if (h) h.innerText = Math.floor((dist % 86400000) / 3600000).toString().padStart(2, '0');
+    if (m) m.innerText = Math.floor((dist % 3600000) / 60000).toString().padStart(2, '0');
+    if (s) s.innerText = Math.floor((dist % 60000) / 1000).toString().padStart(2, '0');
 };
 setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// Immediate start mode
-experienceStarted = true;
-document.body.classList.add('is-scrolling');
+// ─── MAIN ANIMATE LOOP ───────────────────────────────────────────────────
+const animate = () => {
+    currentScroll += (targetScroll - currentScroll) * 0.1;
 
-window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { passive: true });
+    // Draw particles
+    if (ctx && canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+    }
 
-initParticles();
-animate();
+    const vh = window.innerHeight;
+    const scrollMax = Math.max(1, document.documentElement.scrollHeight - vh);
 
-// ========== EVENT TRACKING ==========
-const trackEvent = (type, meta = {}) => {
-    fetch('/api/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, meta })
-    }).catch(() => {}); // fire-and-forget
+    // ── Progress bar
+    if (progressBar) {
+        progressBar.style.width = `${Math.min(100, (currentScroll / scrollMax) * 100)}%`;
+    }
+
+    // ── Video scrub
+    if (motionScrubVideo && !isNaN(motionScrubVideo.duration)) {
+        motionScrubVideo.style.opacity = 1;
+        const ratio = currentScroll / scrollMax;
+        const t = ratio * (motionScrubVideo.duration - 0.05);
+        if (Math.abs(motionScrubVideo.currentTime - t) > 0.033) {
+            motionScrubVideo.currentTime = t;
+        }
+        motionScrubVideo.style.transform = `translate(-50%, -50%) translateZ(0) scale(${1 + ratio * 0.07})`;
+    }
+
+    // ── Scroll hint
+    const scrollHint = document.getElementById('initial-scroll-prompt');
+    if (scrollHint) {
+        scrollHint.style.opacity = currentScroll > 40 ? '0' : '1';
+    }
+
+    // ── HERO LOGO: fades to ZERO by 40% of vh scroll
+    const whiteLogoOpacity = Math.max(0, 1 - (currentScroll / (vh * 0.20)));
+    const colorLogoOpacity = Math.max(0, 1 - (currentScroll / (vh * 0.45)));
+    const logoScale   = 0.88 + colorLogoOpacity * 0.12; // 0.88 → 1.0
+    
+    if (heroLogoImg) {
+        heroLogoImg.style.opacity   = whiteLogoOpacity;
+        heroLogoImg.style.transform = `scale(${logoScale})`;
+    }
+    const heroLogoColor = document.getElementById('hero-logo-color');
+    if (heroLogoColor) {
+        heroLogoColor.style.opacity   = colorLogoOpacity;
+        heroLogoColor.style.transform = `scale(${logoScale})`;
+    }
+
+    // ── HERO VERSE: bell curve, fully gone by 95% of vh scroll
+    //   starts at 10% → peaks at 50% → ends at 95%
+    const vS = vh * 0.10, vE = vh * 0.95;
+    let verseOpacity = 0;
+    if (currentScroll >= vS && currentScroll <= vE) {
+        verseOpacity = Math.sin(((currentScroll - vS) / (vE - vS)) * Math.PI);
+    }
+
+    const heroOverlay = document.getElementById('hero-overlay');
+    const sep   = document.getElementById('hero-separator');
+    const verse = document.getElementById('data-hero-verse');
+    const book  = document.getElementById('data-hero-verse-book');
+    const date  = document.getElementById('data-hero-date');
+
+    const heroVisible = colorLogoOpacity > 0 || verseOpacity > 0.01;
+    if (heroOverlay) heroOverlay.classList.toggle('is-visible', heroVisible);
+
+    if (sep)   sep.style.opacity   = verseOpacity;
+    if (date)  date.style.opacity  = verseOpacity;
+    if (book)  book.style.opacity  = verseOpacity;
+
+    // Verse text: use is-visible class so text-chars reveal via CSS
+    if (verse) {
+        if (verseOpacity > 0.05) {
+            verse.classList.add('is-visible');
+            verse.style.opacity = verseOpacity;
+        } else {
+            verse.classList.remove('is-visible');
+            verse.style.opacity = '0';
+        }
+    }
+
+    // ── SECTIONS: scale in from center, scale out when leaving
+    // Hero is completely gone at scroll = vh * 0.95
+    // Sections should only activate AFTER hero elements have disappeared
+    const heroAllGone = currentScroll > vh * 0.92;
+
+    sections.forEach((sec, index) => {
+        const rect   = sec.getBoundingClientRect();
+        const isFirstSection = index === 0;
+
+        // First section: only activate after hero is completely gone
+        // Subsequent sections: activate when entering viewport (center threshold)
+        let shouldActivate;
+        if (isFirstSection) {
+            shouldActivate = heroAllGone && rect.top < vh * 0.75 && rect.bottom > vh * 0.15;
+        } else {
+            shouldActivate = rect.top < vh * 0.65 && rect.bottom > vh * 0.15;
+        }
+
+        if (shouldActivate) {
+            if (!sec.classList.contains('active')) {
+                sec.classList.add('active', 'is-active');
+                // Stagger children reveals
+                sec.querySelectorAll('.fade-in-text').forEach((el, i) => {
+                    setTimeout(() => el.classList.add('is-visible'), i * 90 + 100);
+                });
+                sec.querySelectorAll('[data-immersive-text]').forEach(el => {
+                    setTimeout(() => el.classList.add('is-visible'), 200);
+                });
+            }
+        } else {
+            // Exit: section scrolled outside view (up or down)
+            if (sec.classList.contains('active')) {
+                sec.classList.remove('active', 'is-active');
+                sec.querySelectorAll('.fade-in-text').forEach(el => el.classList.remove('is-visible'));
+                sec.querySelectorAll('[data-immersive-text]').forEach(el => el.classList.remove('is-visible'));
+            }
+        }
+    });
+
+    requestAnimationFrame(animate);
 };
 
+// ─── SCROLL LISTENER ─────────────────────────────────────────────────────
+window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { passive: true });
+
+// ─── CLIPBOARD / TOAST ───────────────────────────────────────────────────
 window.copyToClipboard = (text, bankName) => {
     if (navigator.vibrate) navigator.vibrate([15, 30, 15]);
-    trackEvent('copy_account', { bank: bankName, number: text });
     navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('toast');
-        if (toast) {
-            toast.innerText = `Copiado: ${bankName}`;
-            toast.classList.add('is-active');
-            setTimeout(() => toast.classList.remove('is-active'), 2500);
-        }
+        if (!toast) return;
+        toast.innerText = `✓ Copiado: ${bankName}`;
+        toast.classList.add('is-active');
+        setTimeout(() => toast.classList.remove('is-active'), 2500);
     });
 };
 
-// ========== RSVP MODAL ==========
+// ─── RSVP MODAL ─────────────────────────────────────────────────────────
 window.openRsvpModal = () => {
     if (navigator.vibrate) navigator.vibrate(10);
-    trackEvent('rsvp_open');
     const modal = document.getElementById('rsvp-modal');
     if (modal) {
         modal.classList.add('is-open');
@@ -385,46 +290,33 @@ window.closeRsvpModal = () => {
     if (modal) modal.classList.remove('is-open');
 };
 
-window.submitRsvp = async () => {
-    const nameEl = document.getElementById('rsvp-name');
-    const guestsEl = document.getElementById('rsvp-guests');
+window.submitRsvp = () => {
+    const nameEl    = document.getElementById('rsvp-name');
+    const guestsEl  = document.getElementById('rsvp-guests');
     const messageEl = document.getElementById('rsvp-message');
-    const submitBtn = document.getElementById('rsvp-submit');
-    
+
     if (!nameEl || !nameEl.value.trim()) {
-        nameEl.style.borderColor = '#e74c3c';
+        nameEl.style.borderColor = 'var(--accent-gold)';
         nameEl.focus();
         return;
     }
 
-    submitBtn.disabled = true;
-    submitBtn.innerText = 'Enviando...';
+    const name    = nameEl.value.trim();
+    const guests  = guestsEl ? (guestsEl.value || 1) : 1;
+    const message = messageEl ? messageEl.value.trim() : '';
 
-    try {
-        const res = await fetch('/api/rsvp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: nameEl.value.trim(),
-                guests: parseInt(guestsEl.value) || 1,
-                message: (messageEl.value || '').trim()
-            })
-        });
-        
-        if (res.ok) {
-            if (navigator.vibrate) navigator.vibrate([20, 50, 20, 50, 20]);
-            document.getElementById('rsvp-form-wrap').style.display = 'none';
-            document.getElementById('rsvp-success').style.display = 'block';
-            if (window.lucide) window.lucide.createIcons();
-            
-            // Auto-close modal after 4s
-            setTimeout(() => window.closeRsvpModal(), 4000);
-        } else {
-            throw new Error('Server error');
-        }
-    } catch (e) {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Confirmar';
-        alert('Error al confirmar. Intenta de nuevo.');
-    }
+    const WA_NUMBER = '18495127494';
+    const text = `¡Hola! Confirmo mi asistencia a la boda ✨%0A%0A*Nombre:* ${name}%0A*Acompañantes:* ${guests}${message ? `%0A*Mensaje:* ${message}` : ''}`;
+
+    window.open(`https://wa.me/${WA_NUMBER}?text=${text}`, '_blank');
+
+    const formWrap  = document.getElementById('rsvp-form-wrap');
+    const successEl = document.getElementById('rsvp-success');
+    if (formWrap)  formWrap.style.display  = 'none';
+    if (successEl) successEl.style.display = 'block';
+    if (window.lucide) window.lucide.createIcons();
 };
+
+// ─── BOOT ────────────────────────────────────────────────────────────────
+initParticles();
+animate();
